@@ -18,12 +18,12 @@
         <gatling-maven-plugin.version>4.9.6</gatling-maven-plugin.version>
     </properties>
 
-    <repositories>
+    <!--repositories>
         <repository>
             <id>gitlab.ext.cyber.ee</id>
             <url>https://gitlab.ext.cyber.ee/api/v4/projects/40/packages/maven</url>
         </repository>
-    </repositories>
+    </repositories-->
 
     <dependencies>
         <dependency>
