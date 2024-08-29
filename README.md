@@ -2,6 +2,15 @@
 
 ## Preconditions for executing tests
 
+* Update client keystore `cdoc2client.p12` only if it was recently updated in cdoc2-capsule-server/keys.
+  Remote repository and branches must be set up manually in `remote_repository.sh` before 
+  running following script:
+
+```bash
+source src/test/resources/remote_repository.sh
+sh src/test/resources/copy_client_keystore.sh
+```
+
 * The latest cdoc2 java libraries are installed locally. From cdoc2-server directory run:
 
 ```
