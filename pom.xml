@@ -108,7 +108,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.5.0</version>
+<!--                can use a constant from ref-impl repo with next release 1.4.0-->
+<!--                <version>${maven-checkstyle-plugin.version}</version>-->
 
                 <configuration>
                     <configLocation>checkstyle.xml</configLocation>
