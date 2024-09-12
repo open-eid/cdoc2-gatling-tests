@@ -43,7 +43,7 @@ public final class KeyStoreUtil {
         // no password
         ks.load(null, null);
 
-        try (var out = Files.newOutputStream(fullPath, StandardOpenOption.CREATE) ) {
+        try (var out = Files.newOutputStream(fullPath, StandardOpenOption.CREATE)) {
             X500Principal subject = new X500Principal("CN=" + cn);
             X500Principal signer = caCert.getIssuerX500Principal();
 
