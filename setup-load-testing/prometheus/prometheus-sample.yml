@@ -1,0 +1,39 @@
+# https://www.callicoder.com/spring-boot-actuator-metrics-monitoring-dashboard-prometheus-grafana/
+# my global config
+global:
+  scrape_interval:     10s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 10s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+# - "first_rules.yml"
+# - "second_rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+    static_configs:
+      - targets: ['127.0.0.1:9090']
+
+  - job_name: 'cdoc2 capsule servers'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 1s
+    # spring management host and port (can't be 127.0.0.1 that is not accessible from docker)
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+    static_configs:
+      - targets:
+          - cdoc2-put-server.host:18444
+          - cdoc2-put-server.host:18443
+    basic_auth:
+      #value of management.endpoints.metrics.username=${CDOC2_ACTUATOR_USERNAME}
+      # cant use env variable here
+      username: CDOC2_ACTUATOR_USERNAME.value
+      #value of management.endpoints.metrics.password=${CDOC2_ACTUATOR_PASSWORD}
+      password: CDOC2_ACTUATOR_PASSWORD.value
