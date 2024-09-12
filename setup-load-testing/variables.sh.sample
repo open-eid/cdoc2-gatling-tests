@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# directory containing source cloned from https://github.com/open-eid/cdoc2-capsule-server
+# used to copy development keys
+CDOC2_CAPSULE_SERVER_DIR=$(pwd)/../../cdoc2-capsule-server
+
+CDOC2_DB_URL=jdbc:postgresql://<DB_HOST>/cdoc2
+CDOC2_DB_USERNAME=<DB_USERNAME>
+CDOC2_DB_PASSWORD=<DB_PASSWORD>
+
+# host running cdoc2-*-server Docker containers, with username
+# username@host
+LOAD_TEST_HOST=ubuntu@<RUN_HOST>
