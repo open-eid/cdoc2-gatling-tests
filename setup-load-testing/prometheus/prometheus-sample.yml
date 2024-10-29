@@ -29,7 +29,7 @@ scrape_configs:
       insecure_skip_verify: true
     static_configs:
       - targets:
-          - cdoc2-put-server.host:18444
+          - cdoc2-get-server.host:18444
           - cdoc2-put-server.host:18443
     basic_auth:
       #value of management.endpoints.metrics.username=${CDOC2_ACTUATOR_USERNAME}
