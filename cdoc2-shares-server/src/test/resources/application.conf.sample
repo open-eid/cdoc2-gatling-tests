@@ -1,0 +1,22 @@
+# CDOC2 Gatling tests configuration for shares server
+
+# shares server configuration
+shares-server {
+  # the base url of the server
+  base-url = "https://localhost:8443"
+}
+
+# Load test configuration
+# See https://gatling.io/docs/gatling/reference/current/core/injection/#incrementuserspersec
+# for details.
+load-test {
+    request {
+        # each user generates 3 different requests and actual rps is 3x
+        start-users-per-second = 10
+        increment-users-per-second = 10
+        increment-cycles = 3
+        cycle-duration-seconds = 10
+        # wait for some shares and nonces to be created for get share input
+        initial-delay-seconds = 5
+    }
+}
