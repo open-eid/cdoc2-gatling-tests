@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# directory containing source cloned from https://github.com/open-eid/cdoc2-shares-server
+# used to copy development keys
+CDOC2_SHARES_SERVER_DIR=$(pwd)/../../cdoc2-shares-server
+
+CDOC2_DB_URL=jdbc:postgresql://<DB_HOST>/cdoc2
+CDOC2_DB_USERNAME=<DB_USERNAME>
+CDOC2_DB_PASSWORD=<DB_PASSWORD>
+
+# host running cdoc2-shares-server Docker containers, with username
+# username@host
+LOAD_TEST_HOST=ubuntu@<RUN_HOST>
