@@ -1,12 +1,12 @@
-Contains semi-automated setup for load-testing. Can be tested locally, but for real load-testing
-needs separate Linux host with Docker and separate postgres database
+Contains semi-automated setup for load-testing. 
 
+Requires Linux host with Docker installed and Postgres DB where empty DB or existing cdoc2-shares-server
+exists.
 
 ### GitHub
 
 Create GitHub Personal Access Token with registry read rights and login to docker
 * `docker login ghcr.io -u $GH_USERNAME`
-
 
 Alternatively 
 
@@ -25,66 +25,47 @@ CR_PAT=<github personal access token with registry read access>
 Checkout https://github.com/open-eid/cdoc2-shares-server
 
 ### Edit variables.sh
-```
+```bash
 cp variables.sh.sample variables.sh
 vim variables.h
 ```
 
-### Copy server keys
-If using development keys from cdoc2-shares-server repo:
-```
-./copy_shares_server_files.sh
+### Copy server keys and certificates
+View `scp.sh` that copies development keys and configuration files from `cdoc2-shares-server` 
+to `$DEST_HOST`
+```bash
+./scp.sh
 ```
 
-Copies `cdoc2server.p12` and `servertruststore.jks` file under `keys`. 
-Copies `test_sid_trusted_issuers.jks` file under `sid-trusted-issuers`. 
 
 #### cdoc2server.p12
 This file contains server TLS certificate and private key.
 
-#### servertruststore.jks
+#### test_sid_trusted_issuers.jks
 Must contain `gatling-ca.pem` (development truststore already contains). 
-Used by shares-server to authenticate clients (client certificate must be signed by cert in truststore). 
+Used by shares-server to authenticate clients (client certificate must be signed by cert in truststore).
 
-### Setup cdoc2 database
+#### logback.xml
+Logging configuration
 
-* Edit `cdoc2-shares-server/server-db/liquibase.properties`
-* Run `mvn liquibase:update` inside `cdoc2-shares-server/server-db`
 
+### Setup cdoc2-shares-server database
+
+```bash
+bash run-cdoc2-shares-server-liquibase.sh
+```
 
 ### Start cdoc2-shares-server servers
 
-Copy configuration to LOAD_TEST_HOST:
-```
-scp.sh
-```
-
-Review `docker run` settings in `run_cdoc2-shares-server.sh` files (options `--cpus` and `--memory`). 
-
-
-On LOAD_TEST_HOST run:
+On DEST_HOST run:
 ```
 ./run_cdoc2-shares-server.sh
 ```
 
-### Install Prometheus/Grafana
-
-* `cp prometheus-sample.yml prometheus.yml`
-* Edit `prometheus.yml`, update `cdoc2-shares-server.host`/`cdoc2-shares-server.host` hostnames and `username` and `password` for `/actuator/prometheus` endpoint
-* Run `prometheus/prometheus.sh` on load host or dedicated prometheus host and check http://<prometheus.host>:9090/targets
-* Run Grafana `prometheus/grafana.sh`
-  - Open http://<grafana.host>:3000 (admin:admin) in browser
-  - [Configure Prometheus data source](https://grafana.com/docs/grafana/latest/datasources/prometheus/configure-prometheus-data-source/)
-  - (Optional) Install https://grafana.com/grafana/dashboards/17360-spring-http-example/
-  - (Optional) Install https://grafana.com/grafana/dashboards/12271-jvm-micrometer/
-
-Note: `http_server_requests_*` metrics appear after you have made some requests against cdoc2 servers 
-
 ### Start load tests
 
-Run from `cdoc2-gatling-tests` 
+Run from `cdoc2-gatling-tests/cdoc2-shares-server` 
 
-* Create test keys:`mvn clean compile`
 * Create and edit `src/test/resources/application.conf`:
   ```
   cp src/test/resources/application.conf.sample src/test/resources/application.conf
@@ -97,10 +78,9 @@ Run from `cdoc2-gatling-tests`
 
 ### Random notes:
 
-#### bash access
+#### Check that cdoc2-shares is up
 
-running container: `docker exec -it cdoc2-shares-server /bin/bash`
-image: `docker run -it --entrypoint /bin/bash ghcr.io/open-eid/cdoc2-shares-server:latest`
+`curl -k https://$DEST_HOST:18442/actuator/health`
 
 #### logs for running container
 

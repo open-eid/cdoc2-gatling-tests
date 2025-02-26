@@ -83,7 +83,7 @@ Note: `http_server_requests_*` metrics appear after you have made some requests 
 
 ### Start load tests
 
-Run from `cdoc2-gatling-tests` 
+Run from `cdoc2-gatling-tests/cdoc2-capsule-server` 
 
 * Create test keys:`mvn clean compile exec:java -Damount=10`
 * Create and edit `src/test/resources/application.conf`:

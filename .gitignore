@@ -6,6 +6,8 @@ cdoc2-capsule-server/capsule-server-test-results.log
 /cdoc2-shares-server/src/test/resources/keys/test-clients/*.p12
 cdoc2-shares-server/shares-server-test-results.log
 
+variables.sh
+
 # ---> Maven
 target/
 pom.xml.tag

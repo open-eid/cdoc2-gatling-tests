@@ -1,13 +1,29 @@
 #!/usr/bin/env bash
 
+DOCKER_REGISTRY=ghcr.io
+DOCKER_REPOSITORY=open-eid
+SHARES_SERVER_VERSION=0.4.1-SNAPSHOT.0-3553a87e54851276c82ee734eebcc207aaf90088
+
 # directory containing source cloned from https://github.com/open-eid/cdoc2-shares-server
-# used to copy development keys
-CDOC2_SHARES_SERVER_DIR=$(pwd)/../../cdoc2-shares-server
+# used to copy development keys and configuration files
+CDOC2_SHARES_SERVER_DIR=$(pwd)/../../../cdoc2-shares-server
 
-CDOC2_DB_URL=jdbc:postgresql://<DB_HOST>/cdoc2
-CDOC2_DB_USERNAME=<DB_USERNAME>
-CDOC2_DB_PASSWORD=<DB_PASSWORD>
+# linux host with docker installed in format username@host
+DEST_HOST=<user>@<host>
 
-# host running cdoc2-shares-server Docker containers, with username
-# username@host
-LOAD_TEST_HOST=ubuntu@<RUN_HOST>
+# will contain cdoc2-shares-server configuration and scripts required to run cdoc2-shares-server in Docker
+DEST_DIR="~/shares-server"
+
+# cdoc2-shares-server configuration directory. Will contain application.properties and certificates
+DEST_CONF_DIR="${DEST_DIR}/config"
+
+# cdoc2-shares-server existing database (emtpy or existing) properties
+POSTGRES_URL=<DB_HOST>:5432
+POSTGRES_DB=cdoc2-shares
+POSTGRES_USER=cdoc2
+POSTGRES_PASSWORD=<DB_PASSWORD>
+
+
+# used to access https://$DEST_HOST:18442/actuator/prometheus and other endpoint
+CDOC2_ACTUATOR_USERNAME=username
+CDOC2_ACTUATOR_PASSWORD=change_it
