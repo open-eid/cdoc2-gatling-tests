@@ -13,6 +13,7 @@ public final class ScenarioIdentifiers {
     public static final String POS_PUT_SHARE_03 = "PUT_SHARE-POS-03";
 
     public static final String POS_PUT_NONCE_01 = "PUT_NONCE-POS-01";
+    public static final String POS_PUT_NONCE_02 = "PUT_NONCE-POS-02";
 
     public static final String POS_GET_SHARE_01 = "GET_SHARE-POS-01";
 

@@ -7,22 +7,16 @@ import ee.cyber.cdoc2.server.conf.TestConfig;
 import ee.cyber.cdoc2.server.dto.KeyShareRequest;
 import io.gatling.javaapi.core.ChainBuilder;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import java.util.HashMap;
-import java.util.Map;
+
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import static io.gatling.javaapi.core.CoreDsl.bodyLength;
 import static io.gatling.javaapi.core.CoreDsl.bodyString;
-import static io.gatling.javaapi.core.CoreDsl.doIfOrElse;
 import static io.gatling.javaapi.core.CoreDsl.exec;
-import static io.gatling.javaapi.core.CoreDsl.scenario;
-import static io.gatling.javaapi.http.HttpDsl.header;
 import static io.gatling.javaapi.http.HttpDsl.http;
 import static io.gatling.javaapi.http.HttpDsl.status;
 
@@ -88,8 +82,10 @@ public abstract class ExecuteGetKeyShares {
         return exec(
             http(testId + " - with shareId '" + shareId + "'")
                 .get(this.testConf.getServerBaseUrl() + API_ENDPOINT + '/' + shareId)
-                .header("x-cdoc2-auth-ticket", TestDataGenerator.RANDOM_X_AUTH_TICKET)
+                .header("x-cdoc2-auth-token", TestDataGenerator.RANDOM_X_AUTH_TOKEN)
                 .header("x-cdoc2-auth-x5c", TestDataGenerator.TEST_CERT_PEM)
+                .header("x-cdoc2-session-token", TestDataGenerator.RANDOM_X_SESSION_TOKEN)
+                .header("x-cdoc2-session-x5c", TestDataGenerator.SID_SIGNING_CERTIFICATE_BASE64URL)
                 .check(
                     status().is(expectedResponse.code()),
                     bodyLength().is(0)
