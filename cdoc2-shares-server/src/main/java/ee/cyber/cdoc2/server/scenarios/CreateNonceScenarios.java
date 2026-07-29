@@ -2,12 +2,9 @@ package ee.cyber.cdoc2.server.scenarios;
 
 import ee.cyber.cdoc2.server.conf.TestConfig;
 import ee.cyber.cdoc2.server.tests.ExecuteCreateNonce;
-import io.gatling.shared.util.Ssl;
 import io.gatling.javaapi.core.ChainBuilder;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.extern.slf4j.Slf4j;
 
-import static io.gatling.javaapi.core.CoreDsl.scenario;
 
 /**
  * Test scenarios for key share nonce

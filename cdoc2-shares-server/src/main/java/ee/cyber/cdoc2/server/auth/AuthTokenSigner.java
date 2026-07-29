@@ -16,7 +16,11 @@ import com.nimbusds.jose.jwk.ECKey;
  * Authentication token signing and ticket creation.
  */
 @Slf4j
-public class AuthTokenSigner {
+public final class AuthTokenSigner {
+
+    private AuthTokenSigner() {
+
+    };
 
     public static String signAuthToken(String serverBaseUrl, String shareId, String nonce) {
         try {

@@ -3,7 +3,6 @@ package ee.cyber.cdoc2.server.tests;
 import ee.cyber.cdoc2.server.SessionVariables;
 import ee.cyber.cdoc2.server.conf.TestConfig;
 import io.gatling.javaapi.core.ChainBuilder;
-import io.gatling.javaapi.http.HttpDsl;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
