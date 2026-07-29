@@ -32,7 +32,7 @@ public abstract class ExecuteCreateSessionNonce {
                 })
                 .check(
                     status().is(HttpResponseStatus.OK.code()),
-                    jsonPath("$.nonce").saveAs(SessionVariables.NONCE)
+                    jsonPath("$.nonce").saveAs(SessionVariables.SESSION_NONCE)
                 )
         ).exitHereIfFailed();
     }

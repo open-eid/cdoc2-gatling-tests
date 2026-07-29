@@ -24,7 +24,8 @@ public final class KeySharesLoadTests extends Simulation {
 
     private final TestConfig config = TestConfig.load();
     private final CreateKeySharesScenarios createSharesScenarios = new CreateKeySharesScenarios(this.config);
-    private final CreateSessionNonceScenarios createSessionNonceScenarios = new CreateSessionNonceScenarios(this.config);
+    private final CreateSessionNonceScenarios createSessionNonceScenarios =
+        new CreateSessionNonceScenarios(this.config);
     private final CreateNonceScenarios createNonceScenarios = new CreateNonceScenarios(this.config);
     private final GetKeySharesScenarios getSharesScenarios = new GetKeySharesScenarios(this.config);
 

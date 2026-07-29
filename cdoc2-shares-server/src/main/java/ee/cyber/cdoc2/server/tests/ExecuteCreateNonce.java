@@ -1,7 +1,9 @@
 package ee.cyber.cdoc2.server.tests;
 
 import ee.cyber.cdoc2.server.SessionVariables;
+import ee.cyber.cdoc2.server.auth.SessionTokenSigner;
 import ee.cyber.cdoc2.server.conf.TestConfig;
+import ee.cyber.cdoc2.server.utils.TestDataGenerator;
 import io.gatling.javaapi.core.ChainBuilder;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.RequiredArgsConstructor;
@@ -34,10 +36,16 @@ public abstract class ExecuteCreateNonce {
                         shareUrl);
                     return this.testConf.getServerBaseUrl() + shareUrl + "/nonce";
                 })
-            .check(
-                status().is(HttpResponseStatus.OK.code()),
-                jsonPath("$.nonce").saveAs(SessionVariables.NONCE)
-            )
+                .header("x-cdoc2-session-token", session -> {
+                    String sessionNonce = session.getString(SessionVariables.SESSION_NONCE);
+                    String nonceUrl = this.testConf.getServerBaseUrl() + "/session_nonce/" + sessionNonce;
+                    return SessionTokenSigner.signSessionToken(nonceUrl);
+                })
+                .header("x-cdoc2-session-x5c", TestDataGenerator.MID_SIGNING_CERTIFICATE_BASE64URL)
+                .check(
+                    status().is(HttpResponseStatus.OK.code()),
+                    jsonPath("$.nonce").saveAs(SessionVariables.NONCE)
+                )
         ).exitHereIfFailed();
     }
 }
