@@ -41,7 +41,7 @@ public abstract class ExecuteCreateNonce {
                     String nonceUrl = this.testConf.getServerBaseUrl() + "/session_nonce/" + sessionNonce;
                     return SessionTokenSigner.signSessionToken(nonceUrl);
                 })
-                .header("x-cdoc2-session-x5c", TestDataGenerator.MID_SIGNING_CERTIFICATE_BASE64URL)
+                .header("x-cdoc2-session-x5c", TestDataGenerator.TEST_CERT_BASE64URL)
                 .check(
                     status().is(HttpResponseStatus.OK.code()),
                     jsonPath("$.nonce").saveAs(SessionVariables.NONCE)
