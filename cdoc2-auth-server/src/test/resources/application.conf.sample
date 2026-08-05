@@ -1,0 +1,25 @@
+# CDOC2 Gatling tests configuration for auth server
+
+# auth server configuration
+auth-server {
+  # the base url of the server
+  base-url = "https://localhost:7500"
+}
+
+# Load test configuration
+# See https://gatling.io/docs/gatling/reference/current/core/injection/#incrementuserspersec
+# for details.
+#
+# Every user starts a Smart-ID auth process and checks its status, each performing a live
+# call to the SK Smart-ID demo environment through the auth server under test, reusing a
+# single fixed demo test identity. Keep the load level modest, as the demo environment is a
+# shared resource.
+load-test {
+    request {
+        start-users-per-second = 1
+        increment-users-per-second = 1
+        increment-cycles = 3
+        cycle-duration-seconds = 10
+        initial-delay-seconds = 0
+    }
+}
