@@ -100,7 +100,7 @@ public abstract class ExecuteGetKeyShares {
             http(testId + " - with shareId '" + shareId + "'")
                 .get(this.testConf.getServerBaseUrl() + API_ENDPOINT + '/' + shareId)
                 .header("x-cdoc2-auth-token", TestDataGenerator.RANDOM_X_AUTH_TOKEN)
-                .header("x-cdoc2-auth-x5c", TestDataGenerator.TEST_CERT_PEM)
+                .header("x-cdoc2-auth-x5c", TestDataGenerator.TEST_CERT_BASE64URL)
                 .header("x-cdoc2-session-token", TestDataGenerator.RANDOM_X_SESSION_TOKEN)
                 .header("x-cdoc2-session-x5c", TestDataGenerator.SID_SIGNING_CERTIFICATE_BASE64URL)
                 .check(
