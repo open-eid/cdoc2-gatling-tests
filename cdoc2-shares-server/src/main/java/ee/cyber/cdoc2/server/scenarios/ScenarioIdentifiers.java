@@ -1,28 +1,30 @@
 package ee.cyber.cdoc2.server.scenarios;
 
 /**
- * Test scenario identifiers
+ * Test scenario identifiers.
+ *
+ * <p>Identifiers follow the naming used in the CDOC2 SmartID/MobileID server test plan
+ * (test_plan_sidmid.md, section "Key Shares Server API functionality tests").
  */
 public final class ScenarioIdentifiers {
 
     private ScenarioIdentifiers() {
     }
 
-    public static final String POS_PUT_SHARE_01 = "PUT_SHARE-POS-01";
-    public static final String POS_PUT_SHARE_02 = "PUT_SHARE-POS-02";
-    public static final String POS_PUT_SHARE_03 = "PUT_SHARE-POS-03";
+    public static final String POS_KEYSHARE_01 = "POST_KEYSHARE-POS-01-ONCE";
+    public static final String POS_KEYSHARE_02 = "POST_KEYSHARE-POS-02-REPEATEDLY";
+    public static final String POS_KEYSHARE_03 = "POST_KEYSHARE-POS-03-RANDOM_CONTENT";
 
-    public static final String POS_PUT_NONCE_01 = "PUT_NONCE-POS-01";
-    public static final String POS_PUT_NONCE_02 = "PUT_NONCE-POS-02";
+    public static final String POS_NONCE_01 = "POST_NONCE-POS-01-CORRECT_SHARE_ID";
+    public static final String POS_SESSION_NONCE_01 = "POST_SESSION_NONCE-POS-01";
 
-    public static final String POS_GET_SHARE_01 = "GET_SHARE-POS-01";
+    public static final String POS_GET_KEYSHARE_01 = "GET_KEYSHARE-POS-01-CORRECT_REQUEST";
 
-    public static final String NEG_GET_SHARE_01 = "GET_SHARE-NEG-01";
-    public static final String NEG_GET_SHARE_02 = "GET_SHARE-NEG-02-EMPTY_STRING_SHARE_ID";
-    public static final String NEG_GET_SHARE_03 = "GET_SHARE-NEG-03-MISSING_SHARE_ID";
-    public static final String NEG_GET_SHARE_04 = "GET_SHARE-NEG-04-MISSING_SHARE_ID_AND_URI_SLASH";
-    public static final String NEG_GET_SHARE_05 = "GET_SHARE-NEG-05-TOO_LONG_RANDOM_SHARE_ID";
-    public static final String NEG_GET_SHARE_06 = "GET_SHARE-NEG-06-RANDOM_AUTH_TICKET";
+    public static final String NEG_POST_KEYSHARE_01 = "POST_KEYSHARE-NEG-01-SHARE_TOO_BIG";
 
-    public static final String NEG_PUT_SHARE_01 = "PUT_SHARE-NEG-01-SHARE_TOO_BIG";
+    public static final String NEG_GET_KEYSHARE_01 = "GET_KEYSHARE-NEG-01-TOO_SHORT_SHARE_ID";
+    public static final String NEG_GET_KEYSHARE_02 = "GET_KEYSHARE-NEG-02-EMPTY_STRING_SHARE_ID";
+    public static final String NEG_GET_KEYSHARE_03 = "GET_KEYSHARE-NEG-03-TOO_LONG_RANDOM_STRING_SHARE_ID";
+    public static final String NEG_GET_KEYSHARE_04 = "GET_KEYSHARE-NEG-04-MISSING_SHARE_ID_AND_URI_SLASH";
+    public static final String NEG_GET_KEYSHARE_05 = "GET_KEYSHARE-NEG-05-RANDOM_AUTH_TICKET";
 }

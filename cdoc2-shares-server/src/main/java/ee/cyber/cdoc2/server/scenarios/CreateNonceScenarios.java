@@ -19,7 +19,7 @@ public class CreateNonceScenarios extends ExecuteCreateNonce {
 
     public ChainBuilder createNonceForKeyShare() {
         return this.sendNonceCheckSuccess(
-            ScenarioIdentifiers.POS_PUT_NONCE_01 + " - Create nonce"
+            ScenarioIdentifiers.POS_NONCE_01 + " - Create nonce"
         );
     }
 }

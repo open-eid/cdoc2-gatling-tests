@@ -26,7 +26,7 @@ public class CreateKeySharesScenarios extends ExecuteCreateKeyShares {
 
         return this.sendKeyShareCheckSuccess(
             x -> payload,
-            ScenarioIdentifiers.POS_PUT_SHARE_01 + " - Create key share"
+            ScenarioIdentifiers.POS_KEYSHARE_01 + " - Create key share"
         );
     }
 
@@ -34,7 +34,7 @@ public class CreateKeySharesScenarios extends ExecuteCreateKeyShares {
         var payload = TestDataGenerator.createKeyShareRequest(TestDataGenerator.KEY_SHARE_MAX_LENGTH);
 
         return scenario("Send key share with random material").exec(
-            this.sendKeyShareCheckSuccess(x -> payload, ScenarioIdentifiers.POS_PUT_SHARE_02)
+            this.sendKeyShareCheckSuccess(x -> payload, ScenarioIdentifiers.POS_KEYSHARE_03)
         );
     }
 
@@ -43,10 +43,10 @@ public class CreateKeySharesScenarios extends ExecuteCreateKeyShares {
 
         return scenario("Send same key share twice").exec(
             this.sendKeyShareCheckSuccess(
-                x -> payload, ScenarioIdentifiers.POS_PUT_SHARE_03 + " - 1st"
+                x -> payload, ScenarioIdentifiers.POS_KEYSHARE_02 + " - 1st"
             ),
             this.sendKeyShareCheckSuccess(
-                x -> payload, ScenarioIdentifiers.POS_PUT_SHARE_03 + " - 2nd"
+                x -> payload, ScenarioIdentifiers.POS_KEYSHARE_02 + " - 2nd"
             )
         );
     }
@@ -55,7 +55,7 @@ public class CreateKeySharesScenarios extends ExecuteCreateKeyShares {
         var payload = TestDataGenerator.createKeyShareRequest(TestDataGenerator.KEY_SHARE_MAX_LENGTH + 1);
 
         return scenario("Fail to create key share with too big key material").exec(
-            this.sendKeyShareCheckError(x -> payload, ScenarioIdentifiers.NEG_PUT_SHARE_01,
+            this.sendKeyShareCheckError(x -> payload, ScenarioIdentifiers.NEG_POST_KEYSHARE_01,
                 HttpResponseStatus.BAD_REQUEST)
         );
     }

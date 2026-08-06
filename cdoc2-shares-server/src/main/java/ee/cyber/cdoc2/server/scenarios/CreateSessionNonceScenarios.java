@@ -19,7 +19,7 @@ public class CreateSessionNonceScenarios extends ExecuteCreateSessionNonce {
 
     public ChainBuilder createSessionNonce() {
         return this.sendSessionNonceCheckSuccess(
-            ScenarioIdentifiers.POS_PUT_NONCE_02 + " - Create session nonce"
+            ScenarioIdentifiers.POS_SESSION_NONCE_01 + " - Create session nonce"
         );
     }
 }
