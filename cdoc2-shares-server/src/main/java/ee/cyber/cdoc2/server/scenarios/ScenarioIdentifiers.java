@@ -27,4 +27,9 @@ public final class ScenarioIdentifiers {
     public static final String NEG_GET_KEYSHARE_03 = "GET_KEYSHARE-NEG-03-TOO_LONG_RANDOM_STRING_SHARE_ID";
     public static final String NEG_GET_KEYSHARE_04 = "GET_KEYSHARE-NEG-04-MISSING_SHARE_ID_AND_URI_SLASH";
     public static final String NEG_GET_KEYSHARE_05 = "GET_KEYSHARE-NEG-05-RANDOM_AUTH_TICKET";
+    public static final String NEG_GET_KEYSHARE_06 = "GET_KEYSHARE-NEG-06-RANDOM_SHARE_ID";
+    public static final String NEG_GET_KEYSHARE_07 = "GET_KEYSHARE-NEG-07-RECIPIENT_NOT_MATCHING";
+    public static final String NEG_GET_KEYSHARE_08 = "GET_KEYSHARE-NEG-08-MISSING_AUTH_HEADERS";
+
+    public static final String NEG_POST_NONCE_01 = "POST_NONCE-NEG-01-RANDOM_SHARE_ID";
 }

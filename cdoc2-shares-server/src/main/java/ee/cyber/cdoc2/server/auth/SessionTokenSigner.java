@@ -40,6 +40,16 @@ public final class SessionTokenSigner {
     }
 
     public static String signSessionToken(String nonceUrl) {
+        return signSessionToken(nonceUrl, TestDataGenerator.RECIPIENT);
+    }
+
+    /**
+     * Creates a session token with a caller-provided subject, so that tests can present an
+     * identity other than the default {@link TestDataGenerator#RECIPIENT}. The subject's
+     * matching certificate must be passed separately as the "x-cdoc2-session-x5c" header, since
+     * the server cross-checks the token subject against that certificate's identity.
+     */
+    public static String signSessionToken(String nonceUrl, String subject) {
         try {
             JWK jwk = JWK.parseFromPEMEncodedObjects(TestDataGenerator.SESSION_TOKEN_SIGNING_KEY);
             ECKey privateKey = jwk.toECKey();
@@ -48,7 +58,7 @@ public final class SessionTokenSigner {
 
             Instant now = Instant.now();
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .subject("etsi/PNOEE-" + TestDataGenerator.TEST_IDENTIFIER_MID)
+                .subject(subject)
                 .issuer(ISSUER)
                 .issueTime(Date.from(now))
                 .expirationTime(Date.from(now.plus(TOKEN_VALIDITY)))

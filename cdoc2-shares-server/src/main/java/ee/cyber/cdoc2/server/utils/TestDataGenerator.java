@@ -27,7 +27,29 @@ public final class TestDataGenerator {
     private static final ObjectMapper JSON = new ObjectMapper();
     private static final Random RANDOM = new Random();
     public static final String TEST_IDENTIFIER_MID = "30303039914";
-    private static final String RECIPIENT = "etsi/PNOEE-" + TEST_IDENTIFIER_MID;
+    public static final String RECIPIENT = "etsi/PNOEE-" + TEST_IDENTIFIER_MID;
+
+    // a second identity, unrelated to RECIPIENT/TEST_CERT_PEM, used to test that the shares
+    // server rejects a key share request when the authenticated identity doesn't match the
+    // share's recipient. Certificate is signed by the same test CA as TEST_CERT_PEM.
+    public static final String MISMATCH_RECIPIENT = "etsi/PNOEE-40404040004";
+    public static final String MISMATCH_CERT_PEM = """
+        -----BEGIN CERTIFICATE-----
+        MIICVjCCAdygAwIBAgIUVW/v3aNWSeOvcVModdxNuutAZQ4wCgYIKoZIzj0EAwIw
+        ajELMAkGA1UEBhMCRUUxEDAOBgNVBAgTB1Vua25vd24xEDAOBgNVBAcTB1RhbGxp
+        bm4xFDASBgNVBAoTC0N5YmVybmV0aWNhMQwwCgYDVQQLEwNJVE8xEzARBgNVBAMT
+        CkdhdGxpbmcgQ0EwHhcNMjYwODA2MTExOTQyWhcNMzYwODAzMTExOTQyWjBtMQsw
+        CQYDVQQGEwJFRTEbMBkGA1UEAwwSUkVDSVBJRU5ULE1JU01BVENIMRIwEAYDVQQE
+        DAlSRUNJUElFTlQxETAPBgNVBCoMCE1JU01BVENIMRowGAYDVQQFExFQTk9FRS00
+        MDQwNDA0MDAwNDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABLKVIe2D09/DP5ro
+        s8u88VtJfqAEz41BXGk+g4xqncQ9fgmCDTNb9UURCJuZiwcg4VOCS5kqTBGdS3TE
+        6WcK3jujXTBbMAwGA1UdEwEB/wQCMAAwCwYDVR0PBAQDAgWgMB0GA1UdDgQWBBSw
+        l4/9PLCqXrFN2mlR5OtYn71tNTAfBgNVHSMEGDAWgBSOc+QzKfFtmItd8CphTRuF
+        ZQPf+zAKBggqhkjOPQQDAgNoADBlAjEAs/+nS6W28RD3W1jtWY/gMJ3K9n2cUBmr
+        YHn7WWU+YKGb3VDGM/Y7CCwwC3GskXMQAjBoLy3Dwn7EucDukzXBgu8oSr/XPPA6
+        IH0wedsGoogx3DFHmiiEBxUbeSUgShVs4FQ=
+        -----END CERTIFICATE-----""";
+    public static final String MISMATCH_CERT_BASE64URL = toBase64Url(MISMATCH_CERT_PEM);
 
     public static final String RANDOM_X_AUTH_TOKEN = "eyJ0eXAiOiJ2bmQuY2RvYzIuYXV0aC10b2tlbi"
         + "52MStzZC1qd3QiLCJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJldHNpL1BOT0VFLTMwMzAzMDM5OTE0I"
@@ -113,7 +135,11 @@ public final class TestDataGenerator {
     }
 
     public static KeyShareRequest createKeyShareRequest(int length) {
-        return new KeyShareRequest(randomBytes(length), RECIPIENT);
+        return createKeyShareRequest(length, RECIPIENT);
+    }
+
+    public static KeyShareRequest createKeyShareRequest(int length, String recipient) {
+        return new KeyShareRequest(randomBytes(length), recipient);
     }
 
     @SneakyThrows

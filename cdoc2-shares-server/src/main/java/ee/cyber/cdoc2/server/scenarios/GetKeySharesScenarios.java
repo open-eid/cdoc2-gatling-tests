@@ -1,5 +1,6 @@
 package ee.cyber.cdoc2.server.scenarios;
 
+import ee.cyber.cdoc2.server.SessionVariables;
 import ee.cyber.cdoc2.server.conf.TestConfig;
 import ee.cyber.cdoc2.server.utils.TestDataGenerator;
 import ee.cyber.cdoc2.server.tests.ExecuteGetKeyShares;
@@ -60,6 +61,39 @@ public class GetKeySharesScenarios extends ExecuteGetKeyShares {
                     ScenarioIdentifiers.NEG_GET_KEYSHARE_05 + " - Random authentication ticket",
                     TestDataGenerator.randomString(TestDataGenerator.SHARE_ID_MIN_LENGTH),
                     HttpResponseStatus.UNAUTHORIZED
+                )
+            ).exitHereIfFailed();
+    }
+
+    /**
+     * Requests a key share for a share ID that was never created. Depends on a session nonce
+     * already being present in the session (see {@link SessionVariables#SESSION_NONCE}).
+     */
+    public ChainBuilder getKeyShareWithRandomShareId() {
+        return this.checkRandomShareIdNotFound(
+            ScenarioIdentifiers.NEG_GET_KEYSHARE_06 + " - Random share ID",
+            HttpResponseStatus.NOT_FOUND
+        );
+    }
+
+    /**
+     * Requests an existing key share, authenticating as an identity other than the share's
+     * recipient. Depends on {@link SessionVariables#LOCATION} and {@link SessionVariables#NONCE}
+     * already referring to a key share created for {@link TestDataGenerator#MISMATCH_RECIPIENT}.
+     */
+    public ChainBuilder getKeyShareWithMismatchedRecipient() {
+        return this.getKeyShareCheckError(
+            ScenarioIdentifiers.NEG_GET_KEYSHARE_07 + " - Recipient not matching",
+            HttpResponseStatus.NOT_FOUND
+        );
+    }
+
+    public ScenarioBuilder getWithMissingAuthHeaders() {
+        return scenario("Request key share without authentication headers")
+            .exec(
+                this.checkMissingAuthHeaders(
+                    ScenarioIdentifiers.NEG_GET_KEYSHARE_08 + " - Missing authentication headers",
+                    HttpResponseStatus.BAD_REQUEST
                 )
             ).exitHereIfFailed();
     }

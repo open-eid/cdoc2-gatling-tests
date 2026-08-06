@@ -51,6 +51,16 @@ public class CreateKeySharesScenarios extends ExecuteCreateKeyShares {
         );
     }
 
+    public ChainBuilder sendKeyShareMismatchedRecipient() {
+        var payload = TestDataGenerator.createKeyShareRequest(
+            TestDataGenerator.KEY_SHARE_MAX_LENGTH, TestDataGenerator.MISMATCH_RECIPIENT
+        );
+
+        return this.sendKeyShareCheckSuccess(
+            x -> payload, "Create key share for mismatched recipient"
+        );
+    }
+
     public ScenarioBuilder sendKeyShareTooBigKeyMaterial() {
         var payload = TestDataGenerator.createKeyShareRequest(TestDataGenerator.KEY_SHARE_MAX_LENGTH + 1);
 
