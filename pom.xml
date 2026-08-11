@@ -18,6 +18,7 @@
         <module>cdoc2-capsule-server</module>
         <module>cdoc2-shares-server</module>
         <module>cdoc2-auth-server</module>
+        <module>cdoc2-rp-server</module>
         <module>mock-sid-mid-server</module>
     </modules>
 
