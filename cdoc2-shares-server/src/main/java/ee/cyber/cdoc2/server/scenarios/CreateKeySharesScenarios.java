@@ -3,7 +3,6 @@ package ee.cyber.cdoc2.server.scenarios;
 import ee.cyber.cdoc2.server.utils.TestDataGenerator;
 import ee.cyber.cdoc2.server.conf.TestConfig;
 import ee.cyber.cdoc2.server.tests.ExecuteCreateKeyShares;
-import io.gatling.shared.util.Ssl;
 import io.gatling.javaapi.core.ChainBuilder;
 import io.gatling.javaapi.core.ScenarioBuilder;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -27,7 +26,7 @@ public class CreateKeySharesScenarios extends ExecuteCreateKeyShares {
 
         return this.sendKeyShareCheckSuccess(
             x -> payload,
-            ScenarioIdentifiers.POS_PUT_SHARE_01 + " - Create key share"
+            ScenarioIdentifiers.POS_KEYSHARE_01 + " - Create key share"
         );
     }
 
@@ -35,7 +34,7 @@ public class CreateKeySharesScenarios extends ExecuteCreateKeyShares {
         var payload = TestDataGenerator.createKeyShareRequest(TestDataGenerator.KEY_SHARE_MAX_LENGTH);
 
         return scenario("Send key share with random material").exec(
-            this.sendKeyShareCheckSuccess(x -> payload, ScenarioIdentifiers.POS_PUT_SHARE_02)
+            this.sendKeyShareCheckSuccess(x -> payload, ScenarioIdentifiers.POS_KEYSHARE_03)
         );
     }
 
@@ -44,11 +43,21 @@ public class CreateKeySharesScenarios extends ExecuteCreateKeyShares {
 
         return scenario("Send same key share twice").exec(
             this.sendKeyShareCheckSuccess(
-                x -> payload, ScenarioIdentifiers.POS_PUT_SHARE_03 + " - 1st"
+                x -> payload, ScenarioIdentifiers.POS_KEYSHARE_02 + " - 1st"
             ),
             this.sendKeyShareCheckSuccess(
-                x -> payload, ScenarioIdentifiers.POS_PUT_SHARE_03 + " - 2nd"
+                x -> payload, ScenarioIdentifiers.POS_KEYSHARE_02 + " - 2nd"
             )
+        );
+    }
+
+    public ChainBuilder sendKeyShareMismatchedRecipient() {
+        var payload = TestDataGenerator.createKeyShareRequest(
+            TestDataGenerator.KEY_SHARE_MAX_LENGTH, TestDataGenerator.MISMATCH_RECIPIENT
+        );
+
+        return this.sendKeyShareCheckSuccess(
+            x -> payload, "Create key share for mismatched recipient"
         );
     }
 
@@ -56,7 +65,7 @@ public class CreateKeySharesScenarios extends ExecuteCreateKeyShares {
         var payload = TestDataGenerator.createKeyShareRequest(TestDataGenerator.KEY_SHARE_MAX_LENGTH + 1);
 
         return scenario("Fail to create key share with too big key material").exec(
-            this.sendKeyShareCheckError(x -> payload, ScenarioIdentifiers.NEG_PUT_SHARE_01,
+            this.sendKeyShareCheckError(x -> payload, ScenarioIdentifiers.NEG_POST_KEYSHARE_01,
                 HttpResponseStatus.BAD_REQUEST)
         );
     }

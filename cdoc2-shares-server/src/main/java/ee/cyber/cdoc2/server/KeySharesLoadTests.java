@@ -3,13 +3,13 @@ package ee.cyber.cdoc2.server;
 import ee.cyber.cdoc2.server.conf.TestConfig;
 import ee.cyber.cdoc2.server.scenarios.CreateKeySharesScenarios;
 import ee.cyber.cdoc2.server.scenarios.CreateNonceScenarios;
+import ee.cyber.cdoc2.server.scenarios.CreateSessionNonceScenarios;
 import ee.cyber.cdoc2.server.scenarios.GetKeySharesScenarios;
 import io.gatling.javaapi.core.Simulation;
 import io.gatling.javaapi.core.ScenarioBuilder;
 import io.gatling.javaapi.http.HttpProtocolBuilder;
 import lombok.extern.slf4j.Slf4j;
 
-import static io.gatling.javaapi.core.CoreDsl.exec;
 import static io.gatling.javaapi.core.CoreDsl.global;
 import static io.gatling.javaapi.core.CoreDsl.incrementUsersPerSec;
 import static io.gatling.javaapi.core.CoreDsl.nothingFor;
@@ -24,6 +24,8 @@ public final class KeySharesLoadTests extends Simulation {
 
     private final TestConfig config = TestConfig.load();
     private final CreateKeySharesScenarios createSharesScenarios = new CreateKeySharesScenarios(this.config);
+    private final CreateSessionNonceScenarios createSessionNonceScenarios =
+        new CreateSessionNonceScenarios(this.config);
     private final CreateNonceScenarios createNonceScenarios = new CreateNonceScenarios(this.config);
     private final GetKeySharesScenarios getSharesScenarios = new GetKeySharesScenarios(this.config);
 
@@ -37,6 +39,7 @@ public final class KeySharesLoadTests extends Simulation {
 
         ScenarioBuilder scenarioBuilder = scenario("Run full key share flow")
             .exec(this.createSharesScenarios.sendKeyShare())
+            .exec(this.createSessionNonceScenarios.createSessionNonce())
             .exec(this.createNonceScenarios.createNonceForKeyShare())
             .exec(this.getSharesScenarios.getKeyShare());
 

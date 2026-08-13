@@ -58,13 +58,6 @@ cp src/test/resources/application.conf.sample src/test/resources/application.con
 
 ## Running functional tests
 
-The following functional tests exist for testing shares server functionality
-* upload shares to server few times (sendKeyShareRepeatedly)
-* upload shares to server with random key material (sendKeyShareRandomKeyMaterial)
-* fail to upload shares to server with too big key material (sendKeyShareTooBigKeyMaterial)
-* Get share with invalid authentication ticket (getWithRandomAuthTicket)
-* Get share with invalid shareId (getWithInvalidShareIds)
-
 A CDOC server must be running on the host:port as configured in the configuration file specified above.
 
 From gatling-tests directory run:

@@ -17,13 +17,19 @@
         <dependency>
             <groupId>ee.cyber.cdoc2</groupId>
             <artifactId>cdoc2-auth-token</artifactId>
-            <version>0.3.3-SNAPSHOT</version>
+            <version>0.7.1</version>
         </dependency>
 
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
-            <version>10.0.1</version>
+            <version>10.9</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.authlete</groupId>
+            <artifactId>sd-jwt</artifactId>
+            <version>1.8</version>
         </dependency>
     </dependencies>
 

@@ -16,7 +16,11 @@ import com.nimbusds.jose.jwk.ECKey;
  * Authentication token signing and ticket creation.
  */
 @Slf4j
-public class AuthTokenSigner {
+public final class AuthTokenSigner {
+
+    private AuthTokenSigner() {
+
+    };
 
     public static String signAuthToken(String serverBaseUrl, String shareId, String nonce) {
         try {
@@ -25,10 +29,10 @@ public class AuthTokenSigner {
             ECDSASigner jwsSigner = new ECDSASigner(privateKey);
 
             EtsiIdentifier etsi
-                = new EtsiIdentifier("etsi/PNOEE-" + TestDataGenerator.TEST_IDENTIFIER);
+                = new EtsiIdentifier("etsi/PNOEE-" + TestDataGenerator.TEST_IDENTIFIER_MID);
 
             AuthTokenCreator tokenSigner = AuthTokenCreator.builder()
-                .withEtsiIdentifier(etsi) // "iss" field etsi/PNOEE-30303039914
+                .withEtsiIdentifier(etsi)
                 .withShareAccessData(new ShareAccessData(
                     serverBaseUrl,
                     shareId,

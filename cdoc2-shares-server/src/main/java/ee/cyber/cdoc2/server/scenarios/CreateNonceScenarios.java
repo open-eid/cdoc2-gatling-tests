@@ -2,12 +2,11 @@ package ee.cyber.cdoc2.server.scenarios;
 
 import ee.cyber.cdoc2.server.conf.TestConfig;
 import ee.cyber.cdoc2.server.tests.ExecuteCreateNonce;
-import io.gatling.shared.util.Ssl;
+import ee.cyber.cdoc2.server.utils.TestDataGenerator;
 import io.gatling.javaapi.core.ChainBuilder;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.extern.slf4j.Slf4j;
 
-import static io.gatling.javaapi.core.CoreDsl.scenario;
 
 /**
  * Test scenarios for key share nonce
@@ -22,7 +21,21 @@ public class CreateNonceScenarios extends ExecuteCreateNonce {
 
     public ChainBuilder createNonceForKeyShare() {
         return this.sendNonceCheckSuccess(
-            ScenarioIdentifiers.POS_PUT_NONCE_01 + " - Create nonce"
+            ScenarioIdentifiers.POS_NONCE_01 + " - Create nonce"
+        );
+    }
+
+    public ChainBuilder createNonceForMismatchedRecipientShare() {
+        return this.sendNonceCheckSuccess(
+            "Create nonce for mismatched-recipient key share",
+            TestDataGenerator.MISMATCH_RECIPIENT,
+            TestDataGenerator.MISMATCH_CERT_BASE64URL
+        );
+    }
+
+    public ChainBuilder createNonceForNonExistingShare() {
+        return this.sendNonceForNonExistingShareCheckError(
+            ScenarioIdentifiers.NEG_POST_NONCE_01, HttpResponseStatus.NOT_FOUND
         );
     }
 }

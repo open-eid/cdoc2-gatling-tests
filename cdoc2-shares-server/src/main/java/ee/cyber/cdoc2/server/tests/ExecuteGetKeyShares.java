@@ -1,28 +1,24 @@
 package ee.cyber.cdoc2.server.tests;
 
 import ee.cyber.cdoc2.server.auth.AuthTokenSigner;
+import ee.cyber.cdoc2.server.auth.RpSignatureSigner;
+import ee.cyber.cdoc2.server.auth.SessionTokenSigner;
 import ee.cyber.cdoc2.server.SessionVariables;
 import ee.cyber.cdoc2.server.utils.TestDataGenerator;
 import ee.cyber.cdoc2.server.conf.TestConfig;
 import ee.cyber.cdoc2.server.dto.KeyShareRequest;
 import io.gatling.javaapi.core.ChainBuilder;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import java.util.HashMap;
-import java.util.Map;
+
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import static io.gatling.javaapi.core.CoreDsl.bodyLength;
 import static io.gatling.javaapi.core.CoreDsl.bodyString;
-import static io.gatling.javaapi.core.CoreDsl.doIfOrElse;
 import static io.gatling.javaapi.core.CoreDsl.exec;
-import static io.gatling.javaapi.core.CoreDsl.scenario;
-import static io.gatling.javaapi.http.HttpDsl.header;
 import static io.gatling.javaapi.http.HttpDsl.http;
 import static io.gatling.javaapi.http.HttpDsl.status;
 
@@ -48,14 +44,20 @@ public abstract class ExecuteGetKeyShares {
     protected ChainBuilder getKeyShareCheckSuccess(String testId) {
         String serverBaseUrl = this.testConf.getServerBaseUrl();
 
-        return exec(
+        return exec(session -> {
+            RpSignatureSigner.RpSignatureHeaders rpSignatureHeaders = RpSignatureSigner.sign();
+            return session
+                .set(SessionVariables.RP_SIGNED_HASH, rpSignatureHeaders.rpSignedHash())
+                .set(SessionVariables.RP_SIGNATURE_INPUT, rpSignatureHeaders.signatureInput())
+                .set(SessionVariables.RP_SIGNATURE, rpSignatureHeaders.signature());
+        }).exec(
             http(testId)
                 .get(session -> {
                     String shareUrl = session.getString(SessionVariables.LOCATION);
                     log.info("Request \"{}\". Share ID location is {}", testId, shareUrl);
                     return serverBaseUrl + shareUrl;
                 })
-                .header("x-cdoc2-auth-ticket", session -> {
+                .header("x-cdoc2-auth-token", session -> {
                     String shareUrl = session.getString(SessionVariables.LOCATION);
                     String[] shareIdLocation = shareUrl.split("/");
                     String shareId = shareIdLocation[shareIdLocation.length - 1];
@@ -63,10 +65,19 @@ public abstract class ExecuteGetKeyShares {
 
                     String nonce = session.get(SessionVariables.NONCE);
                     log.info("Request \"{}\". Nonce is {}", testId, nonce);
-                    String xAuthTicket = generateAuthTicket(serverBaseUrl, shareId, nonce);
-                    return xAuthTicket;
+                    return generateAuthToken(serverBaseUrl, shareId, nonce);
                 })
-                .header("x-cdoc2-auth-x5c", TestDataGenerator.TEST_CERT_PEM)
+                .header("x-cdoc2-auth-x5c", TestDataGenerator.TEST_CERT_BASE64URL)
+                .header("x-cdoc2-session-token", session -> {
+                    String sessionNonce = session.getString(SessionVariables.SESSION_NONCE);
+                    String nonceUrl = serverBaseUrl + "/session_nonce/" + sessionNonce;
+                    return SessionTokenSigner.signSessionToken(nonceUrl);
+                })
+                .header("x-cdoc2-session-x5c", TestDataGenerator.TEST_CERT_BASE64URL)
+                .header("x-rp-signed-hash", session -> session.getString(SessionVariables.RP_SIGNED_HASH))
+                .header("x-rp-name", "DEMO")
+                .header("Signature-Input", session -> session.getString(SessionVariables.RP_SIGNATURE_INPUT))
+                .header("Signature", session -> session.getString(SessionVariables.RP_SIGNATURE))
                 .check(
                     status().is(HttpResponseStatus.OK.code()),
                     bodyString().saveAs(SessionVariables.KEY_SHARE_RESPONSE),
@@ -76,7 +87,97 @@ public abstract class ExecuteGetKeyShares {
                         return response;
                     })
                 )
-            ).exitHereIfFailed();
+        ).exitHereIfFailed();
+    }
+
+    /**
+     * Gets the key share for the current session's {@link SessionVariables#LOCATION}/
+     * {@link SessionVariables#NONCE}, authenticating with the default identity, and verifies
+     * that an error response was received. Used when the share exists but its recipient doesn't
+     * match the authenticated identity (see {@link TestDataGenerator#MISMATCH_RECIPIENT}).
+     */
+    protected ChainBuilder getKeyShareCheckError(String testId, HttpResponseStatus expectedResponse) {
+        String serverBaseUrl = this.testConf.getServerBaseUrl();
+
+        return exec(session -> {
+            RpSignatureSigner.RpSignatureHeaders rpSignatureHeaders = RpSignatureSigner.sign();
+            return session
+                .set(SessionVariables.RP_SIGNED_HASH, rpSignatureHeaders.rpSignedHash())
+                .set(SessionVariables.RP_SIGNATURE_INPUT, rpSignatureHeaders.signatureInput())
+                .set(SessionVariables.RP_SIGNATURE, rpSignatureHeaders.signature());
+        }).exec(
+            http(testId)
+                .get(session -> serverBaseUrl + session.getString(SessionVariables.LOCATION))
+                .header("x-cdoc2-auth-token", session -> {
+                    String shareUrl = session.getString(SessionVariables.LOCATION);
+                    String[] shareIdLocation = shareUrl.split("/");
+                    String shareId = shareIdLocation[shareIdLocation.length - 1];
+                    String nonce = session.get(SessionVariables.NONCE);
+                    return generateAuthToken(serverBaseUrl, shareId, nonce);
+                })
+                .header("x-cdoc2-auth-x5c", TestDataGenerator.TEST_CERT_BASE64URL)
+                .header("x-cdoc2-session-token", session -> {
+                    String sessionNonce = session.getString(SessionVariables.SESSION_NONCE);
+                    String nonceUrl = serverBaseUrl + "/session_nonce/" + sessionNonce;
+                    return SessionTokenSigner.signSessionToken(nonceUrl);
+                })
+                .header("x-cdoc2-session-x5c", TestDataGenerator.TEST_CERT_BASE64URL)
+                .header("x-rp-signed-hash", session -> session.getString(SessionVariables.RP_SIGNED_HASH))
+                .header("x-rp-name", "DEMO")
+                .header("Signature-Input", session -> session.getString(SessionVariables.RP_SIGNATURE_INPUT))
+                .header("Signature", session -> session.getString(SessionVariables.RP_SIGNATURE))
+                .check(status().is(expectedResponse.code()))
+        ).exitHereIfFailed();
+    }
+
+    /**
+     * Requests a key share for a share ID that was never created, with an otherwise fully
+     * valid, freshly-signed authentication ticket, and verifies that an error response was
+     * received.
+     */
+    protected ChainBuilder checkRandomShareIdNotFound(String testId, HttpResponseStatus expectedResponse) {
+        String serverBaseUrl = this.testConf.getServerBaseUrl();
+        String shareId = TestDataGenerator.randomString(TestDataGenerator.SHARE_ID_MIN_LENGTH);
+        String nonce = TestDataGenerator.randomString(TestDataGenerator.SHARE_ID_MIN_LENGTH);
+
+        return exec(session -> {
+            RpSignatureSigner.RpSignatureHeaders rpSignatureHeaders = RpSignatureSigner.sign();
+            return session
+                .set(SessionVariables.RP_SIGNED_HASH, rpSignatureHeaders.rpSignedHash())
+                .set(SessionVariables.RP_SIGNATURE_INPUT, rpSignatureHeaders.signatureInput())
+                .set(SessionVariables.RP_SIGNATURE, rpSignatureHeaders.signature());
+        }).exec(
+            http(testId + " - with shareId '" + shareId + "'")
+                .get(serverBaseUrl + API_ENDPOINT + '/' + shareId)
+                .header("x-cdoc2-auth-token", generateAuthToken(serverBaseUrl, shareId, nonce))
+                .header("x-cdoc2-auth-x5c", TestDataGenerator.TEST_CERT_BASE64URL)
+                .header("x-cdoc2-session-token", session -> {
+                    String sessionNonce = session.getString(SessionVariables.SESSION_NONCE);
+                    String nonceUrl = serverBaseUrl + "/session_nonce/" + sessionNonce;
+                    return SessionTokenSigner.signSessionToken(nonceUrl);
+                })
+                .header("x-cdoc2-session-x5c", TestDataGenerator.TEST_CERT_BASE64URL)
+                .header("x-rp-signed-hash", session -> session.getString(SessionVariables.RP_SIGNED_HASH))
+                .header("x-rp-name", "DEMO")
+                .header("Signature-Input", session -> session.getString(SessionVariables.RP_SIGNATURE_INPUT))
+                .header("Signature", session -> session.getString(SessionVariables.RP_SIGNATURE))
+                .check(status().is(expectedResponse.code()))
+        ).exitHereIfFailed();
+    }
+
+    /**
+     * Requests a key share without any authentication headers.
+     */
+    protected ChainBuilder checkMissingAuthHeaders(String testId, HttpResponseStatus expectedResponse) {
+        String shareId = TestDataGenerator.randomString(TestDataGenerator.SHARE_ID_MIN_LENGTH);
+
+        return exec(
+            http(testId + " - with shareId '" + shareId + "'")
+                .get(this.testConf.getServerBaseUrl() + API_ENDPOINT + '/' + shareId)
+                .check(
+                    status().is(expectedResponse.code())
+                )
+        );
     }
 
     // sends a request with the invalid share id or authentication ticket
@@ -88,8 +189,10 @@ public abstract class ExecuteGetKeyShares {
         return exec(
             http(testId + " - with shareId '" + shareId + "'")
                 .get(this.testConf.getServerBaseUrl() + API_ENDPOINT + '/' + shareId)
-                .header("x-cdoc2-auth-ticket", TestDataGenerator.RANDOM_X_AUTH_TICKET)
-                .header("x-cdoc2-auth-x5c", TestDataGenerator.TEST_CERT_PEM)
+                .header("x-cdoc2-auth-token", TestDataGenerator.RANDOM_X_AUTH_TOKEN)
+                .header("x-cdoc2-auth-x5c", TestDataGenerator.TEST_CERT_BASE64URL)
+                .header("x-cdoc2-session-token", TestDataGenerator.RANDOM_X_SESSION_TOKEN)
+                .header("x-cdoc2-session-x5c", TestDataGenerator.SID_SIGNING_CERTIFICATE_BASE64URL)
                 .check(
                     status().is(expectedResponse.code()),
                     bodyLength().is(0)
@@ -129,7 +232,7 @@ public abstract class ExecuteGetKeyShares {
             .orElseThrow(() -> new RuntimeException("No sent data for user " + userId));
     }
 
-    private String generateAuthTicket(
+    private String generateAuthToken(
         String serverBaseUrl,
         String shareId,
         String nonce

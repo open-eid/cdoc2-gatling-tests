@@ -14,7 +14,17 @@
     <packaging>pom</packaging>
     <description>CDOC2 loading tests for Capsule Server and Shares Server</description>
 
+    <modules>
+        <module>cdoc2-capsule-server</module>
+        <module>cdoc2-shares-server</module>
+        <module>cdoc2-auth-server</module>
+        <module>mock-sid-mid-server</module>
+    </modules>
+
     <properties>
+        <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <lombok.version>1.18.36</lombok.version>
         <gatling.version>3.13.3</gatling.version>
         <gatling-maven-plugin.version>4.12.2</gatling-maven-plugin.version>
