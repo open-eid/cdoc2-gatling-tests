@@ -11,6 +11,7 @@ public final class ScenarioIdentifiers {
     public static final String POS_SID_AUTHENTICATE_01 = "POST_SID_AUTHENTICATE-POS-01";
     public static final String POS_SID_SESSION_01 = "GET_SID_SESSION-POS-01";
     public static final String POS_MID_AUTHENTICATE_01 = "POST_MID_AUTHENTICATE-POS-01";
+    public static final String POS_MID_AUTHENTICATE_02 = "POST_MID_AUTHENTICATE-POS-02-DISPLAY_TEXT_FORMAT_DEFAULTING";
     public static final String POS_MID_SESSION_01 = "GET_MID_SESSION-POS-01";
 
     public static final String NEG_SID_AUTHENTICATE_01 = "POST_SID_AUTHENTICATE-NEG-01-SESSION_TOKEN_MISSING";
@@ -52,8 +53,6 @@ public final class ScenarioIdentifiers {
         "POST_MID_AUTHENTICATE-NEG-10-HASH_TYPE_MISSING";
     public static final String NEG_MID_AUTHENTICATE_11 = "POST_MID_AUTHENTICATE-NEG-11-LANGUAGE_MISSING";
     public static final String NEG_MID_AUTHENTICATE_12 = "POST_MID_AUTHENTICATE-NEG-12-DISPLAY_TEXT_MISSING";
-    // TODO: This is actually a positive scenario
-    public static final String NEG_MID_AUTHENTICATE_13 = "POST_MID_AUTHENTICATE-NEG-13-DISPLAY_TEXT_FORMAT_MISSING";
 
     public static final String NEG_MID_SESSION_01 = "GET_MID_SESSION-NEG-01-SESSION_TOKEN_MISSING";
     public static final String NEG_MID_SESSION_02 = "GET_MID_SESSION-NEG-02-SESSION_TOKEN_MALFORMED";

@@ -221,7 +221,7 @@ public class MidAuthenticateScenarios extends ExecuteMidAuthenticate {
 
         return scenario("Authenticate via MID with missing display text format uses default").exec(
             this.sendMidAuthenticateWithPayload(
-                ScenarioIdentifiers.NEG_MID_AUTHENTICATE_13,
+                ScenarioIdentifiers.POS_MID_AUTHENTICATE_02,
                 payload,
                 HttpResponseStatus.OK
             )
