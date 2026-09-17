@@ -6,7 +6,7 @@
     <parent>
         <artifactId>cdoc2</artifactId>
         <groupId>ee.cyber.cdoc2</groupId>
-        <version>1.4.1</version>
+        <version>3.5.1</version>
     </parent>
 
     <artifactId>cdoc2-auth-server-sid-mid-mock</artifactId>
