@@ -1,8 +1,7 @@
 package ee.cyber.cdoc2.server.datagen;
 
-import ee.cyber.cdoc2.crypto.ECKeys;
-import ee.cyber.cdoc2.crypto.RsaUtils;
-import ee.cyber.cdoc2.crypto.KeyAlgorithm;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigInteger;
 import java.security.KeyPair;
@@ -17,8 +16,7 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.Date;
 import javax.security.auth.x500.X500Principal;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
+
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x509.Extension;
@@ -31,6 +29,11 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+
+import ee.cyber.cdoc2.crypto.ECKeys;
+import ee.cyber.cdoc2.crypto.EllipticCurve;
+import ee.cyber.cdoc2.crypto.KeyAlgorithm;
+import ee.cyber.cdoc2.crypto.RsaUtils;
 
 /**
  * Utility class for generating keys and certificates
@@ -52,12 +55,12 @@ public final class CertUtil {
 
     @SneakyThrows
     static X509Certificate generateCertificate(X500Principal subject, KeyPair subjectKeyPair,
-            X500Principal signedBy, KeyPair signedByKeyPair, String cn) {
+                                               X500Principal signedBy, KeyPair signedByKeyPair, String cn) {
 
         var notBefore = Instant.now();
         var notAfter = notBefore.plus(CERT_VALIDITY);
 
-        var altNames = new ASN1Encodable[] {
+        var altNames = new ASN1Encodable[]{
             new GeneralName(GeneralName.dNSName, cn)
         };
 
@@ -92,7 +95,7 @@ public final class CertUtil {
 
     @SneakyThrows
     public static KeyPair generateEcKeyPair() {
-        ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(ECKeys.SECP_384_R_1);
+        ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(EllipticCurve.SECP384R1.name());
         try {
             KeyPairGenerator keyPairGenerator
                 = KeyPairGenerator.getInstance(KeyAlgorithm.Algorithm.EC.name(), BC);
