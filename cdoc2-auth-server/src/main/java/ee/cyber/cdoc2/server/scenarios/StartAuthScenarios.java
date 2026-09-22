@@ -1,14 +1,16 @@
 package ee.cyber.cdoc2.server.scenarios;
 
-import ee.cyber.cdoc2.server.conf.TestConfig;
-import ee.cyber.cdoc2.server.dto.AuthIdentityRequest;
-import ee.cyber.cdoc2.server.tests.ExecuteStartAuth;
-import ee.cyber.cdoc2.server.utils.TestDataGenerator;
 import io.gatling.javaapi.core.ChainBuilder;
 import io.gatling.javaapi.core.ScenarioBuilder;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.extern.slf4j.Slf4j;
 
+import ee.cyber.cdoc2.server.conf.TestConfig;
+import ee.cyber.cdoc2.server.dto.AuthIdentityRequest;
+import ee.cyber.cdoc2.server.tests.ExecuteStartAuth;
+import ee.cyber.cdoc2.server.utils.TestDataGenerator;
+
+import static ee.cyber.cdoc2.server.utils.TestDataGenerator.*;
 import static io.gatling.javaapi.core.CoreDsl.scenario;
 
 /**
@@ -26,7 +28,8 @@ public class StartAuthScenarios extends ExecuteStartAuth {
      * to the SK Smart-ID demo environment through the auth server under test.
      */
     public ChainBuilder startSidAuth() {
-        var payload = TestDataGenerator.createSidAuthRequest();
+        var payload = new AuthIdentityRequest(SID_IDENTIFIER_OK, null, LANGUAGE_ET);
+        ;
 
         return this.sendStartAuthCheckSuccess(
             x -> payload,
@@ -35,15 +38,40 @@ public class StartAuthScenarios extends ExecuteStartAuth {
     }
 
     /**
+     * Starts a Smart-ID auth process for the SID demo test identity without specifying language
+     */
+    public ChainBuilder startSidAuthNoLanguage() {
+        var payload = new AuthIdentityRequest(SID_IDENTIFIER_OK, null, null);
+        ;
+
+        return this.sendStartAuthCheckSuccess(
+            x -> payload,
+            ScenarioIdentifiers.POS_START_AUTH_03 + " - Start SID auth with no language"
+        );
+    }
+
+    /**
      * Starts a Mobile-ID auth process for the MID demo test identity. Performs a live call
      * to the SK Mobile-ID demo environment through the auth server under test.
      */
     public ChainBuilder startMidAuth() {
-        var payload = TestDataGenerator.createMidAuthRequest();
+        var payload = new AuthIdentityRequest(MID_IDENTIFIER_OK, MID_PHONE_NUMBER_OK, LANGUAGE_ET);
 
         return this.sendStartAuthCheckSuccess(
             x -> payload,
             ScenarioIdentifiers.POS_START_AUTH_02 + " - Start MID auth"
+        );
+    }
+
+    /**
+     * Starts a Mobile-ID auth process for the MID demo test identity without specifying language
+     */
+    public ChainBuilder startMidAuthNoLanguage() {
+        var payload = new AuthIdentityRequest(MID_IDENTIFIER_OK, MID_PHONE_NUMBER_OK, null);
+
+        return this.sendStartAuthCheckSuccess(
+            x -> payload,
+            ScenarioIdentifiers.POS_START_AUTH_04 + " - Start MID auth with no language"
         );
     }
 
@@ -61,8 +89,16 @@ public class StartAuthScenarios extends ExecuteStartAuth {
         return scenario("Start SID auth").exec(this.startSidAuth());
     }
 
+    public ScenarioBuilder startSidAuthNoLanguageScenario() {
+        return scenario("Start SID auth with no language").exec(this.startSidAuthNoLanguage());
+    }
+
     public ScenarioBuilder startMidAuthScenario() {
         return scenario("Start MID auth").exec(this.startMidAuth());
+    }
+
+    public ScenarioBuilder startMidAuthNoLanguageScenario() {
+        return scenario("Start MID auth with no language").exec(this.startMidAuthNoLanguage());
     }
 
     public ScenarioBuilder startAuthWithMissingIdentifier() {
@@ -128,7 +164,7 @@ public class StartAuthScenarios extends ExecuteStartAuth {
 
     public ScenarioBuilder startAuthWithMobileNrTooShort() {
         var payload = new AuthIdentityRequest(
-            TestDataGenerator.SID_IDENTIFIER_OK,
+            SID_IDENTIFIER_OK,
             TestDataGenerator.randomString(TestDataGenerator.MOBILE_NR_MIN_LENGTH - 1),
             null
         );
@@ -144,7 +180,7 @@ public class StartAuthScenarios extends ExecuteStartAuth {
 
     public ScenarioBuilder startAuthWithMobileNrTooLong() {
         var payload = new AuthIdentityRequest(
-            TestDataGenerator.SID_IDENTIFIER_OK,
+            SID_IDENTIFIER_OK,
             TestDataGenerator.randomString(TestDataGenerator.MOBILE_NR_MAX_LENGTH + 1),
             null
         );
@@ -152,7 +188,7 @@ public class StartAuthScenarios extends ExecuteStartAuth {
         return scenario("Fail to start auth with too long mobile number").exec(
             this.sendStartAuthCheckError(
                 x -> payload,
-                ScenarioIdentifiers.NEG_START_AUTH_05_MOBILE_NR_TOO_LONG,
+                ScenarioIdentifiers.NEG_START_AUTH_06_MOBILE_NR_TOO_LONG,
                 HttpResponseStatus.BAD_REQUEST
             )
         );
@@ -160,15 +196,16 @@ public class StartAuthScenarios extends ExecuteStartAuth {
 
     public ScenarioBuilder startAuthWithUnknownLanguage() {
         var payload = new AuthIdentityRequest(
-            TestDataGenerator.SID_IDENTIFIER_OK,
+            SID_IDENTIFIER_OK,
             null,
-            "unknown-language"
+            "zz"
         );
 
-        return scenario("Start auth with unknown language falls back to default language").exec(
-            this.sendStartAuthCheckSuccess(
+        return scenario("Fail to start auth with unknown language").exec(
+            this.sendStartAuthCheckError(
                 x -> payload,
-                ScenarioIdentifiers.NEG_START_AUTH_06 + " - accepted, falls back to default language"
+                ScenarioIdentifiers.NEG_START_AUTH_06 + " - accepted, falls back to default language",
+                HttpResponseStatus.BAD_REQUEST
             )
         );
     }

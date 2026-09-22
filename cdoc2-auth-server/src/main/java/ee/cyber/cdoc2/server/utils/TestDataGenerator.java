@@ -1,10 +1,13 @@
 package ee.cyber.cdoc2.server.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import ee.cyber.cdoc2.server.dto.AuthIdentityRequest;
-import java.util.Random;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Random;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import ee.cyber.cdoc2.server.dto.AuthIdentityRequest;
 
 /**
  * Generates test data
@@ -37,6 +40,8 @@ public final class TestDataGenerator {
     public static final String MID_IDENTIFIER_OK = "etsi/PNOEE-51307149560";
     public static final String MID_PHONE_NUMBER_OK = "+37269930366";
 
+    public static final String LANGUAGE_ET = "ET";
+
     /**
      * SK Smart-ID demo environment test identity that always has the user refuse the auth
      * request. Sourced from cdoc2-auth-server's own AbstractAuthServerTest. The mock
@@ -59,6 +64,7 @@ public final class TestDataGenerator {
     /**
      * Generates a random alphanumeric string with exactly the given character length, for
      * precise boundary testing of "identifier"/"mobileNr" length constraints.
+     *
      * @param length the exact length of the string
      * @return a random string with exactly the given length
      */
@@ -68,20 +74,6 @@ public final class TestDataGenerator {
             builder.append(ALPHANUMERIC_CHARS.charAt(RANDOM.nextInt(ALPHANUMERIC_CHARS.length())));
         }
         return builder.toString();
-    }
-
-    /**
-     * Builds a request that starts a Smart-ID auth process for the SID demo test identity.
-     */
-    public static AuthIdentityRequest createSidAuthRequest() {
-        return new AuthIdentityRequest(SID_IDENTIFIER_OK, null, null);
-    }
-
-    /**
-     * Builds a request that starts a Mobile-ID auth process for the MID demo test identity.
-     */
-    public static AuthIdentityRequest createMidAuthRequest() {
-        return new AuthIdentityRequest(MID_IDENTIFIER_OK, MID_PHONE_NUMBER_OK, null);
     }
 
     /**

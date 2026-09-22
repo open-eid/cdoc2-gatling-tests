@@ -48,6 +48,12 @@ public final class StartAuthFunctionalTests extends Simulation {
             this.startAuthScenarios.startMidAuthScenario()
                 .injectOpen(atOnceUsers(1))
                 .protocols(this.client),
+            this.startAuthScenarios.startSidAuthNoLanguageScenario()
+                .injectOpen(atOnceUsers(1))
+                .protocols(this.client),
+            this.startAuthScenarios.startMidAuthNoLanguageScenario()
+                .injectOpen(atOnceUsers(1))
+                .protocols(this.client),
             this.startAuthScenarios.startAuthWithMissingIdentifier()
                 .injectOpen(atOnceUsers(1))
                 .protocols(this.client),
