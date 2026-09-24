@@ -39,19 +39,19 @@ public final class StartAuthConstantLoadTests extends Simulation {
 
         int concurrentUsers = loadTestConfig.concurrentUsers() / 2;
         Long concurrentUsersDuration = loadTestConfig.concurrentUsersDuration();
-        int rampDownUsers = loadTestConfig.rampDownUsers() / 2;
-        Long rampDownDuration = loadTestConfig.rampDownDuration();
+        int rampUsers = loadTestConfig.rampUsers() / 2;
+        Long rampDuration = loadTestConfig.rampDuration();
 
         setUp(
             sidAuthScenarioBuilder.injectClosed(
                 constantConcurrentUsers(concurrentUsers)
                     .during(concurrentUsersDuration), // 1
-                rampConcurrentUsers(concurrentUsers).to(rampDownUsers).during(rampDownDuration)
+                rampConcurrentUsers(concurrentUsers).to(rampUsers).during(rampDuration)
             ),
             midAuthScenarioBuilder.injectClosed(
                 constantConcurrentUsers(concurrentUsers)
                     .during(concurrentUsersDuration), // 1
-                rampConcurrentUsers(concurrentUsers).to(rampDownUsers).during(rampDownDuration)
+                rampConcurrentUsers(concurrentUsers).to(rampUsers).during(rampDuration)
             )
         ).protocols(this.httpConf)
             .assertions(global().successfulRequests().percent().is(100.0));

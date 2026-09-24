@@ -1,12 +1,12 @@
 package ee.cyber.cdoc2.server.conf;
 
 /**
- * Load test configuration
+ * Constant load test configuration
  */
 public record ConstantLoadTestConfig(
     int concurrentUsers,
     Long concurrentUsersDuration,
-    int rampDownUsers,
-    Long rampDownDuration
+    int rampUsers,
+    Long rampDuration
 ) {
 }
