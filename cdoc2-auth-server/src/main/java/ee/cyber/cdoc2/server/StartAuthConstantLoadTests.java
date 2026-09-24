@@ -37,10 +37,10 @@ public final class StartAuthConstantLoadTests extends Simulation {
             .exec(this.startAuthScenarios.startMidAuth())
             .exec(this.getAuthStatusScenarios.getAuthStatus());
 
-        int concurrentUsers = loadTestConfig.getConcurrentUsers() / 2;
-        Long concurrentUsersDuration = loadTestConfig.getConcurrentUsersDuration();
-        int rampDownUsers = loadTestConfig.getRampDownUsers() / 2;
-        Long rampDownDuration = loadTestConfig.getRampDownDuration();
+        int concurrentUsers = loadTestConfig.concurrentUsers() / 2;
+        Long concurrentUsersDuration = loadTestConfig.concurrentUsersDuration();
+        int rampDownUsers = loadTestConfig.rampDownUsers() / 2;
+        Long rampDownDuration = loadTestConfig.rampDownDuration();
 
         setUp(
             sidAuthScenarioBuilder.injectClosed(
