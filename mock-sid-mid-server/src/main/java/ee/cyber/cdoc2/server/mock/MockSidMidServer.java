@@ -1,11 +1,13 @@
 package ee.cyber.cdoc2.server.mock;
 
-import com.sun.net.httpserver.HttpServer;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
-import lombok.extern.slf4j.Slf4j;
+
+import com.sun.net.httpserver.HttpServer;
 
 /**
  * A minimal stand-in for the Smart-ID and Mobile-ID demo REST APIs, so that
@@ -28,21 +30,28 @@ public final class MockSidMidServer {
 
     public static void main(String[] args) throws IOException {
         int port = Integer.getInteger("mock-server.port", DEFAULT_PORT);
+        boolean completeSessionImmediate = Boolean.getBoolean("mock-server.sessionImmediate");
 
         HttpServer server = HttpServer.create(new InetSocketAddress(port), SOCKET_BACKLOG);
 
         // sessionId -> endResult ("OK"/"USER_REFUSED"), shared between the two SID handlers
-        ConcurrentHashMap<String, String> sidSessionEndResults = new ConcurrentHashMap<>();
+        ConcurrentHashMap<String, String> midSidSessionStates = new ConcurrentHashMap<>();
 
         // Smart-ID: POST /authentication/notification/etsi/{semanticsIdentifier}, GET /session/{sessionId}
-        server.createContext("/authentication/notification/etsi", new SidAuthenticationHandler(sidSessionEndResults));
-        server.createContext("/session", new SidSessionStatusHandler(sidSessionEndResults));
+        server.createContext("/authentication/notification/etsi", new SidAuthenticationHandler(midSidSessionStates));
+        server.createContext("/session", new SidSessionStatusHandler(
+            midSidSessionStates,
+            completeSessionImmediate
+        ));
 
         // Mobile-ID: POST /authentication, GET /authentication/session/{sessionId}
         // ("/authentication/session" is registered separately so it wins over "/authentication"
         // for that more specific path, per HttpServer's longest-prefix context matching)
-        server.createContext("/authentication/session", new MidSessionStatusHandler());
-        server.createContext("/authentication", new MidAuthenticationHandler());
+        server.createContext("/authentication", new MidAuthenticationHandler(midSidSessionStates));
+        server.createContext("/authentication/session", new MidSessionStatusHandler(
+            midSidSessionStates,
+            completeSessionImmediate
+        ));
 
         server.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
         server.start();

@@ -6,6 +6,7 @@ import ee.cyber.cdoc2.server.utils.TestDataGenerator;
 import io.gatling.javaapi.core.ChainBuilder;
 import io.gatling.javaapi.core.ScenarioBuilder;
 import io.netty.handler.codec.http.HttpResponseStatus;
+
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,32 +34,29 @@ public class GetAuthStatusScenarios extends ExecuteGetAuthStatus {
      * a load test chain step - not tied to a specific test plan scenario id.
      */
     public ChainBuilder getAuthStatus() {
-        return this.getAuthStatusCheckStatusIs("Get auth process status", STATUS_COMPLETE);
+        return this.pollAuthStatusCheckStatusIs("Get auth process status", STATUS_COMPLETE);
     }
 
     /**
-     * Expects the process (started via SID against the mock SID/MID server, which completes
-     * on its first status poll - see mock-sid-mid-server/README.md) to already be COMPLETE.
+     * Expects the process polling to result in COMPLETE.
      */
-    public ChainBuilder getAuthStatusCompletedOnce() {
-        return this.getAuthStatusCheckStatusIs(
+    public ChainBuilder pollAuthStatusCompleted() {
+        return this.pollAuthStatusCheckStatusIs(
             ScenarioIdentifiers.POS_AUTH_STATUS_01 + " - Get completed auth process status",
             STATUS_COMPLETE
         );
     }
 
-    public ChainBuilder getAuthStatusCompletedFirstPoll() {
-        return this.getAuthStatusCheckStatusIs(ScenarioIdentifiers.POS_AUTH_STATUS_02 + " - 1st", STATUS_COMPLETE);
+    public ChainBuilder pollAuthStatusCompletedFirst() {
+        return this.pollAuthStatusCheckStatusIs(ScenarioIdentifiers.POS_AUTH_STATUS_02 + " - 1st", STATUS_COMPLETE);
     }
 
-    public ChainBuilder getAuthStatusCompletedSecondPoll() {
+    public ChainBuilder getAuthStatusCompletedSecond() {
         return this.getAuthStatusCheckStatusIs(ScenarioIdentifiers.POS_AUTH_STATUS_02 + " - 2nd", STATUS_COMPLETE);
     }
 
     /**
-     * Expects the process to still be running. Only reachable via a Mobile-ID auth process:
-     * the mock SID/MID server always reports MID sessions as running, while SID sessions
-     * complete on the first poll - see mock-sid-mid-server/README.md.
+     * Expects the process to still be running.
      */
     public ChainBuilder getAuthStatusRunning() {
         return this.getAuthStatusCheckStatusIs(
@@ -68,11 +66,11 @@ public class GetAuthStatusScenarios extends ExecuteGetAuthStatus {
     }
 
     /**
-     * Expects the process (started via SID for the "always refused" test identity - see
-     * StartAuthScenarios.startSidAuthForRefusal()) to have failed.
+     * Expects the process (started via SID/MID for the "always refused" test identity) to
+     * result in FAILED.
      */
     public ChainBuilder getAuthStatusFailed() {
-        return this.getAuthStatusCheckStatusIs(
+        return this.pollAuthStatusCheckStatusIs(
             ScenarioIdentifiers.POS_AUTH_STATUS_04 + " - Get failed auth process status",
             STATUS_FAILED
         );

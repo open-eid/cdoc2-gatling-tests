@@ -1,14 +1,18 @@
 package ee.cyber.cdoc2.server.mock;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+
+import static ee.cyber.cdoc2.server.mock.SessionStateHelper.SESSION_RUNNING_MARKER;
 
 /**
  * Mocks Smart-ID's "POST /authentication/notification/etsi/{semanticsIdentifier}", which
@@ -24,12 +28,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 final class SidAuthenticationHandler implements HttpHandler {
-
-    static final String USER_REFUSED_IDENTIFIER_MARKER = "30403039917";
+    private static final String USER_REFUSED_IDENTIFIER_MARKER = "30403039917";
 
     private static final ObjectMapper JSON = new ObjectMapper();
 
-    private final ConcurrentHashMap<String, String> sessionEndResults;
+    private final ConcurrentHashMap<String, String> sessionStates;
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
@@ -40,10 +43,13 @@ final class SidAuthenticationHandler implements HttpHandler {
 
         String path = exchange.getRequestURI().getPath();
         String sessionId = UUID.randomUUID().toString();
-        String endResult = path.contains(USER_REFUSED_IDENTIFIER_MARKER) ? "USER_REFUSED" : "OK";
-        this.sessionEndResults.put(sessionId, endResult);
+        String sessionState = path.contains(USER_REFUSED_IDENTIFIER_MARKER)
+            ? SESSION_RUNNING_MARKER + "USER_REFUSED"
+            : SESSION_RUNNING_MARKER + "OK";
+        this.sessionStates.put(sessionId, sessionState);
 
-        log.info("SID authentication started ({}), session {} will report {}", path, sessionId, endResult);
+        log.info("SID authentication started ({}), session {}, state {}", path, sessionId,
+            sessionState);
 
         MockHttpUtil.respondJson(exchange, 200, JSON.writeValueAsString(Map.of("sessionID", sessionId)));
     }

@@ -7,13 +7,13 @@ auth-server {
 }
 
 # Load test configuration
-# See https://gatling.io/docs/gatling/reference/current/core/injection/#incrementuserspersec
+# See https://gatling.io/docs/gatling/reference/current/core/injection/
 # for details.
 #
-# Every user starts a Smart-ID auth process and checks its status, each performing a live
-# call to the SK Smart-ID demo environment through the auth server under test, reusing a
-# single fixed demo test identity. Keep the load level modest, as the demo environment is a
-# shared resource.
+# Keep the load level modest when when the auth server is configured to call the SK demo environment
+#
+# Half the user start a Smart-ID auth process and half a Mobile-ID auth process and check its status, each performing a
+# call to the auth server under test, reusing a single fixed demo test identity.
 load-test {
     request {
         start-users-per-second = 1
@@ -21,5 +21,19 @@ load-test {
         increment-cycles = 3
         cycle-duration-seconds = 10
         initial-delay-seconds = 0
+        at-once-users = 0
+    }
+}
+
+# Half the user start a Smart-ID auth process and half a Mobile-ID auth process and check its status, each performing a
+# call to the auth server under test, reusing a single fixed demo test identity.
+# Test runs with a number of concurrent users for a set duration, after which user count is ramped
+# (up or down) over a duration
+constant-load-test {
+    request {
+        concurrent-users = 20
+        concurrent-users-duration-seconds = 10
+        ramp-to-users = 0
+        ramp-duration-seconds = 1
     }
 }
