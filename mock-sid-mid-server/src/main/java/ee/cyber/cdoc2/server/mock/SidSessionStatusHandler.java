@@ -1,14 +1,20 @@
 package ee.cyber.cdoc2.server.mock;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+
+import static ee.cyber.cdoc2.server.mock.SessionStateHelper.SESSION_RUNNING_MARKER;
+import static ee.cyber.cdoc2.server.mock.SessionStateHelper.calculateSessionEndResult;
 
 /**
  * Mocks Smart-ID's "GET /session/{sessionId}". Always reports the session as COMPLETE on the
@@ -23,12 +29,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 final class SidSessionStatusHandler implements HttpHandler {
-
     private static final String END_RESULT_OK = "OK";
 
     private static final ObjectMapper JSON = new ObjectMapper();
 
-    private final ConcurrentHashMap<String, String> sessionEndResults;
+    private final ConcurrentHashMap<String, String> sessionStates;
+    private final boolean completeSessionImmediate;
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
@@ -37,16 +43,26 @@ final class SidSessionStatusHandler implements HttpHandler {
             return;
         }
 
-        String sessionId = lastPathSegment(exchange.getRequestURI().getPath());
-        String endResult = this.sessionEndResults.getOrDefault(sessionId, END_RESULT_OK);
+        String sessionEndResult = calculateSessionEndResult(
+            exchange.getRequestURI(),
+            this.sessionStates,
+            completeSessionImmediate
+        );
 
-        log.info("SID session status requested ({}) -> COMPLETE/{}", exchange.getRequestURI(), endResult);
+        if (sessionEndResult == null) {
+            log.info("SID session status requested ({}) -> RUNNING", exchange.getRequestURI());
+            MockHttpUtil.respondJson(exchange, 200, runningSessionStatus());
+        } else {
+            log.info("SID session status requested ({}) -> COMPLETE/{}", exchange.getRequestURI(), sessionEndResult);
 
-        MockHttpUtil.respondJson(exchange, 200, JSON.writeValueAsString(completeSessionStatus(endResult)));
+            MockHttpUtil.respondJson(exchange, 200, JSON.writeValueAsString(completeSessionStatus(sessionEndResult)));
+        }
     }
 
-    private static String lastPathSegment(String path) {
-        return path.substring(path.lastIndexOf('/') + 1);
+    private static String runningSessionStatus() throws JsonProcessingException {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("state", "RUNNING");
+        return JSON.writeValueAsString(body);
     }
 
     private static Map<String, Object> completeSessionStatus(String endResult) {
