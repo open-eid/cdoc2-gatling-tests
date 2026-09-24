@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @ToString
 public class TestConfig {
-
     private final String serverBaseUrl;
     private final LoadTestConfig loadTestConfig;
     private final ConstantLoadTestConfig constantLoadTestConfig;
