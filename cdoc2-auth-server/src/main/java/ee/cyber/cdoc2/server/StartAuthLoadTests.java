@@ -47,25 +47,25 @@ public final class StartAuthLoadTests extends Simulation {
             .exec(this.startAuthScenarios.startMidAuth())
             .exec(this.getAuthStatusScenarios.getAuthStatus());
 
-        var userIncrement = loadTestConfig.getIncrementUsersPerSec() / 2.0;
-        var startingUserPerSec = loadTestConfig.getStartingUsersPerSec() / 2.0;
-        var atOnceUsers = loadTestConfig.getAtOnceUsers() / 2;
+        var userIncrement = loadTestConfig.incrementUsersPerSec() / 2.0;
+        var startingUserPerSec = loadTestConfig.startingUsersPerSec() / 2.0;
+        var atOnceUsers = loadTestConfig.atOnceUsers() / 2;
 
         setUp(
             sidAuthScenarioBuilder.injectOpen(
-                nothingFor(loadTestConfig.getRequestStartDelay()),
+                nothingFor(loadTestConfig.requestStartDelay()),
                 atOnceUsers(atOnceUsers),
                 incrementUsersPerSec(userIncrement)
-                    .times(loadTestConfig.getIncrementCycles())
-                    .eachLevelLasting(loadTestConfig.getCycleDurationSec())
+                    .times(loadTestConfig.incrementCycles())
+                    .eachLevelLasting(loadTestConfig.cycleDurationSec())
                     .startingFrom(startingUserPerSec)
             ),
             midAuthScenarioBuilder.injectOpen(
-                nothingFor(loadTestConfig.getRequestStartDelay()),
+                nothingFor(loadTestConfig.requestStartDelay()),
                 atOnceUsers(atOnceUsers),
                 incrementUsersPerSec(userIncrement)
-                    .times(loadTestConfig.getIncrementCycles())
-                    .eachLevelLasting(loadTestConfig.getCycleDurationSec())
+                    .times(loadTestConfig.incrementCycles())
+                    .eachLevelLasting(loadTestConfig.cycleDurationSec())
                     .startingFrom(startingUserPerSec)
                 )
         ).protocols(this.httpConf)
