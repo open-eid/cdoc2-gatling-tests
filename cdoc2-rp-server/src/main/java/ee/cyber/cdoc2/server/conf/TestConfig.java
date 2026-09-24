@@ -16,9 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @ToString
 public class TestConfig {
-
     private final String serverBaseUrl;
     private final LoadTestConfig loadTestConfig;
+    private final ConstantLoadTestConfig constantLoadTestConfig;
 
     /**
      * Loads the configuration from file
@@ -28,7 +28,8 @@ public class TestConfig {
 
         var testConf = new TestConfig(
             conf.getString("rp-server.base-url"),
-            readLoadTestConfig(conf)
+            readLoadTestConfig(conf),
+            reloadConstantLoadTestConfig(conf)
         );
 
         log.info("Loaded test configuration: {}", testConf);
@@ -44,7 +45,19 @@ public class TestConfig {
             request.getInt("increment-cycles"),
             request.getLong("cycle-duration-seconds"),
             request.getLong("start-users-per-second"),
-            request.getLong("initial-delay-seconds")
+            request.getLong("initial-delay-seconds"),
+            request.getInt("at-once-users")
+        );
+    }
+
+    private static ConstantLoadTestConfig reloadConstantLoadTestConfig(Config config) {
+        var request = config.getConfig("constant-load-test.request");
+
+        return new ConstantLoadTestConfig(
+            request.getInt("concurrent-users"),
+            request.getLong("concurrent-users-duration-seconds"),
+            request.getInt("ramp-to-users"),
+            request.getLong("ramp-duration-seconds")
         );
     }
 }

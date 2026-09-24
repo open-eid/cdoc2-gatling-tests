@@ -8,7 +8,8 @@ public record LoadTestConfig(
     int incrementCycles,
     Long cycleDurationSec,
     Long startingUsersPerSec,
-    Long requestStartDelay
+    Long requestStartDelay,
+    int atOnceUsers
 ) {
 
 }

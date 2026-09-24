@@ -1,15 +1,15 @@
 package ee.cyber.cdoc2.server;
 
+import io.gatling.javaapi.core.ScenarioBuilder;
+import io.gatling.javaapi.core.Simulation;
+import io.gatling.javaapi.http.HttpProtocolBuilder;
+import lombok.extern.slf4j.Slf4j;
+
 import ee.cyber.cdoc2.server.conf.TestConfig;
 import ee.cyber.cdoc2.server.scenarios.MidAuthenticateScenarios;
 import ee.cyber.cdoc2.server.scenarios.MidSessionScenarios;
 import ee.cyber.cdoc2.server.scenarios.SidAuthenticateScenarios;
 import ee.cyber.cdoc2.server.scenarios.SidSessionScenarios;
-
-import io.gatling.javaapi.core.Simulation;
-import io.gatling.javaapi.core.ScenarioBuilder;
-import io.gatling.javaapi.http.HttpProtocolBuilder;
-import lombok.extern.slf4j.Slf4j;
 
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.http;
@@ -18,7 +18,7 @@ import static io.gatling.javaapi.http.HttpDsl.http;
  * Load tests for the "/sid/authenticate" and "/sid/session/{sessionID}" endpoints.
  */
 @Slf4j
-public final class RpServerLoadTests extends Simulation {
+public final class RpServerConstantLoadTests extends Simulation {
 
     private final TestConfig config = TestConfig.load();
     private final SidAuthenticateScenarios sidAuthenticateScenarios = new SidAuthenticateScenarios(this.config);
@@ -34,7 +34,7 @@ public final class RpServerLoadTests extends Simulation {
         .disableWarmUp();
 
     {
-        var loadTestConfig = this.config.getLoadTestConfig();
+        var loadTestConfig = this.config.getConstantLoadTestConfig();
 
         ScenarioBuilder sidScenarioBuilder = scenario("Authenticate via SID and get its session status")
             .exec(this.sidAuthenticateScenarios.startSidAuthenticate())
@@ -44,26 +44,21 @@ public final class RpServerLoadTests extends Simulation {
             .exec(this.midAuthenticateScenarios.startMidAuthenticate())
             .exec(this.midSessionScenarios.getMidSession());
 
-        var userIncrement = loadTestConfig.incrementUsersPerSec() / 2.0;
-        var startingUserPerSec = loadTestConfig.startingUsersPerSec() / 2.0;
-        var atOnceUsers = loadTestConfig.atOnceUsers() / 2;
+        int concurrentUsers = loadTestConfig.concurrentUsers() / 2;
+        Long concurrentUsersDuration = loadTestConfig.concurrentUsersDuration();
+        int rampUsers = loadTestConfig.rampUsers() / 2;
+        Long rampDuration = loadTestConfig.rampDuration();
 
         setUp(
-            sidScenarioBuilder.injectOpen(
-                nothingFor(loadTestConfig.requestStartDelay()),
-                atOnceUsers(atOnceUsers),
-                incrementUsersPerSec(userIncrement)
-                    .times(loadTestConfig.incrementCycles())
-                    .eachLevelLasting(loadTestConfig.cycleDurationSec())
-                    .startingFrom(startingUserPerSec)
+            sidScenarioBuilder.injectClosed(
+                constantConcurrentUsers(concurrentUsers)
+                    .during(concurrentUsersDuration), // 1
+                rampConcurrentUsers(concurrentUsers).to(rampUsers).during(rampDuration)
             ),
-            midScenarioBuilder.injectOpen(
-                nothingFor(loadTestConfig.requestStartDelay()),
-                atOnceUsers(atOnceUsers),
-                incrementUsersPerSec(userIncrement)
-                    .times(loadTestConfig.incrementCycles())
-                    .eachLevelLasting(loadTestConfig.cycleDurationSec())
-                    .startingFrom(startingUserPerSec)
+            midScenarioBuilder.injectClosed(
+                constantConcurrentUsers(concurrentUsers)
+                    .during(concurrentUsersDuration), // 1
+                rampConcurrentUsers(concurrentUsers).to(rampUsers).during(rampDuration)
             )
         ).protocols(this.httpConf)
             .assertions(global().successfulRequests().percent().is(100.0));
