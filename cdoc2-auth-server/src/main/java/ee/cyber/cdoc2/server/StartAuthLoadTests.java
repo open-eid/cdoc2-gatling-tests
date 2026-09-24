@@ -47,22 +47,27 @@ public final class StartAuthLoadTests extends Simulation {
             .exec(this.startAuthScenarios.startMidAuth())
             .exec(this.getAuthStatusScenarios.getAuthStatus());
 
+        var userIncrement = loadTestConfig.getIncrementUsersPerSec() / 2.0;
+        var startingUserPerSec = loadTestConfig.getStartingUsersPerSec() / 2.0;
+        var atOnceUsers = loadTestConfig.getAtOnceUsers() / 2;
 
         setUp(
             sidAuthScenarioBuilder.injectOpen(
-                    nothingFor(loadTestConfig.getRequestStartDelay()),
-                    incrementUsersPerSec(loadTestConfig.getIncrementUsersPerSec())
-                        .times(loadTestConfig.getIncrementCycles())
-                        .eachLevelLasting(loadTestConfig.getCycleDurationSec())
-                        .startingFrom(loadTestConfig.getStartingUsersPerSec())
-                ),
-            midAuthScenarioBuilder.injectOpen(
                 nothingFor(loadTestConfig.getRequestStartDelay()),
-                incrementUsersPerSec(loadTestConfig.getIncrementUsersPerSec())
+                atOnceUsers(atOnceUsers),
+                incrementUsersPerSec(userIncrement)
                     .times(loadTestConfig.getIncrementCycles())
                     .eachLevelLasting(loadTestConfig.getCycleDurationSec())
-                    .startingFrom(loadTestConfig.getStartingUsersPerSec())
-            )
+                    .startingFrom(startingUserPerSec)
+            ),
+            midAuthScenarioBuilder.injectOpen(
+                nothingFor(loadTestConfig.getRequestStartDelay()),
+                atOnceUsers(atOnceUsers),
+                incrementUsersPerSec(userIncrement)
+                    .times(loadTestConfig.getIncrementCycles())
+                    .eachLevelLasting(loadTestConfig.getCycleDurationSec())
+                    .startingFrom(startingUserPerSec)
+                )
         ).protocols(this.httpConf)
             .assertions(global().successfulRequests().percent().is(100.0));
     }

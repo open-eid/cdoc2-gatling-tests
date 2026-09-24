@@ -7,11 +7,10 @@ import lombok.Value;
  */
 @Value
 public class LoadTestConfig {
-
     Long incrementUsersPerSec;
     int incrementCycles;
     Long cycleDurationSec;
     Long startingUsersPerSec;
     Long requestStartDelay;
-
+    int atOnceUsers;
 }

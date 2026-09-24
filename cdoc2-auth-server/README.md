@@ -65,6 +65,12 @@ start request.
 
 For executing load tests run from gatling-tests directory:
 
+#### User increment load tests
 ```
 mvn gatling:test -Dgatling.simulationClass=ee.cyber.cdoc2.server.StartAuthLoadTests
+```
+
+#### Constant user load tests with ramp down
+```
+mvn gatling:test -Dgatling.simulationClass=ee.cyber.cdoc2.server.StartAuthConstantLoadTests
 ```
