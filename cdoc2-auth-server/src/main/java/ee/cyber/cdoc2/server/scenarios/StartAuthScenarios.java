@@ -29,7 +29,6 @@ public class StartAuthScenarios extends ExecuteStartAuth {
      */
     public ChainBuilder startSidAuth() {
         var payload = new AuthIdentityRequest(SID_IDENTIFIER_OK, null, LANGUAGE_ET);
-        ;
 
         return this.sendStartAuthCheckSuccess(
             x -> payload,
@@ -42,7 +41,6 @@ public class StartAuthScenarios extends ExecuteStartAuth {
      */
     public ChainBuilder startSidAuthNoLanguage() {
         var payload = new AuthIdentityRequest(SID_IDENTIFIER_OK, null, null);
-        ;
 
         return this.sendStartAuthCheckSuccess(
             x -> payload,

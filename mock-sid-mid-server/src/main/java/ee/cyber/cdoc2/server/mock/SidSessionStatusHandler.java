@@ -13,19 +13,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
-import static ee.cyber.cdoc2.server.mock.SessionStateHelper.SESSION_RUNNING_MARKER;
 import static ee.cyber.cdoc2.server.mock.SessionStateHelper.calculateSessionEndResult;
 
-/**
- * Mocks Smart-ID's "GET /session/{sessionId}". Always reports the session as COMPLETE on the
- * first poll, with the end result ({@code OK} or {@code USER_REFUSED}) recorded by
- * {@link SidAuthenticationHandler} for that session ID. cdoc2-auth-server embeds the
- * "signature" object verbatim into the issued session token without cryptographically
- * verifying it, so its exact content does not matter here, only its presence for the OK case.
- * <p>
- * {@code sessionEndResults} is never evicted, so it grows for the lifetime of the process -
- * fine for a finite test/load run, restart the mock between runs if that matters.
- */
 @Slf4j
 @RequiredArgsConstructor
 final class SidSessionStatusHandler implements HttpHandler {
