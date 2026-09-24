@@ -49,6 +49,8 @@ public final class TestDataGenerator {
      * refused/failed auth process for it.
      */
     public static final String SID_IDENTIFIER_USER_REFUSED = "etsi/PNOEE-30403039917";
+    public static final String MID_IDENTIFIER_USER_CANCELLED = "etsi/PNOEE-60001019950";
+    public static final String MID_PHONE_USER_CANCELLED = "+37201100266";
 
     private static final String ALPHANUMERIC_CHARS =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -82,5 +84,13 @@ public final class TestDataGenerator {
      */
     public static AuthIdentityRequest createSidAuthRequestForRefusal() {
         return new AuthIdentityRequest(SID_IDENTIFIER_USER_REFUSED, null, null);
+    }
+
+    /**
+     * Builds a request that starts a Mobile-ID auth process for the "user cancelled" MID demo
+     * test identity.
+     */
+    public static AuthIdentityRequest createMidAuthRequestForRefusal() {
+        return new AuthIdentityRequest(MID_IDENTIFIER_USER_CANCELLED, MID_PHONE_USER_CANCELLED, null);
     }
 }

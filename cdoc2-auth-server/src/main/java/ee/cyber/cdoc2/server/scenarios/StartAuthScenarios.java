@@ -97,6 +97,16 @@ public class StartAuthScenarios extends ExecuteStartAuth {
         return scenario("Start MID auth").exec(this.startMidAuth());
     }
 
+    /**
+     * Starts a Smart-ID auth process for the "user cancelled" MID demo test identity - used
+     * as setup for the GET_AUTH_STATUS-POS-04-FAILED scenario, not a scenario id of its own.
+     */
+    public ChainBuilder startMidAuthForRefusal() {
+        var payload = TestDataGenerator.createMidAuthRequestForRefusal();
+
+        return this.sendStartAuthCheckSuccess(x -> payload, "Start MID auth (will be refused)");
+    }
+
     public ScenarioBuilder startMidAuthNoLanguageScenario() {
         return scenario("Start MID auth with no language").exec(this.startMidAuthNoLanguage());
     }

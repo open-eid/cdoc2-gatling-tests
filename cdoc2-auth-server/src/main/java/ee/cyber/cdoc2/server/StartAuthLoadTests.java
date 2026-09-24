@@ -1,17 +1,15 @@
 package ee.cyber.cdoc2.server;
 
-import ee.cyber.cdoc2.server.conf.TestConfig;
-import ee.cyber.cdoc2.server.scenarios.GetAuthStatusScenarios;
-import ee.cyber.cdoc2.server.scenarios.StartAuthScenarios;
-import io.gatling.javaapi.core.Simulation;
 import io.gatling.javaapi.core.ScenarioBuilder;
+import io.gatling.javaapi.core.Simulation;
 import io.gatling.javaapi.http.HttpProtocolBuilder;
 import lombok.extern.slf4j.Slf4j;
 
-import static io.gatling.javaapi.core.CoreDsl.global;
-import static io.gatling.javaapi.core.CoreDsl.incrementUsersPerSec;
-import static io.gatling.javaapi.core.CoreDsl.nothingFor;
-import static io.gatling.javaapi.core.CoreDsl.scenario;
+import ee.cyber.cdoc2.server.conf.TestConfig;
+import ee.cyber.cdoc2.server.scenarios.GetAuthStatusScenarios;
+import ee.cyber.cdoc2.server.scenarios.StartAuthScenarios;
+
+import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.http;
 
 /**
@@ -41,18 +39,30 @@ public final class StartAuthLoadTests extends Simulation {
     {
         var loadTestConfig = this.config.getLoadTestConfig();
 
-        ScenarioBuilder scenarioBuilder = scenario("Start SID auth and get its status")
+        ScenarioBuilder sidAuthScenarioBuilder = scenario("Start SID auth and get its status")
             .exec(this.startAuthScenarios.startSidAuth())
             .exec(this.getAuthStatusScenarios.getAuthStatus());
 
+        ScenarioBuilder midAuthScenarioBuilder = scenario("Start MID auth and get its status")
+            .exec(this.startAuthScenarios.startMidAuth())
+            .exec(this.getAuthStatusScenarios.getAuthStatus());
+
+
         setUp(
-            scenarioBuilder.injectOpen(
+            sidAuthScenarioBuilder.injectOpen(
                     nothingFor(loadTestConfig.getRequestStartDelay()),
                     incrementUsersPerSec(loadTestConfig.getIncrementUsersPerSec())
                         .times(loadTestConfig.getIncrementCycles())
                         .eachLevelLasting(loadTestConfig.getCycleDurationSec())
                         .startingFrom(loadTestConfig.getStartingUsersPerSec())
-                )
+                ),
+            midAuthScenarioBuilder.injectOpen(
+                nothingFor(loadTestConfig.getRequestStartDelay()),
+                incrementUsersPerSec(loadTestConfig.getIncrementUsersPerSec())
+                    .times(loadTestConfig.getIncrementCycles())
+                    .eachLevelLasting(loadTestConfig.getCycleDurationSec())
+                    .startingFrom(loadTestConfig.getStartingUsersPerSec())
+            )
         ).protocols(this.httpConf)
             .assertions(global().successfulRequests().percent().is(100.0));
     }

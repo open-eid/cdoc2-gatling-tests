@@ -12,8 +12,7 @@ Currently, covers the `POST /auth/start`, `GET /auth/status/{authProcessUuid}` a
 
   For load testing, point the auth server instance at
   [../mock-sid-mid-server](../mock-sid-mid-server) instead of the real SK demo environment -
-  see that module's README for setup and for exactly what it does and doesn't mock (the SID
-  flow is fully covered; the MID flow only up through `/auth/start`).
+  see that module's README for setup.
 
 ## Configuration
 
@@ -45,7 +44,7 @@ unrelated to the auth server itself.
 A CDOC2 auth server must be running on the host:port as configured in the configuration file
 specified above.
 
-From gatling-tests directory run:
+From `cdoc2-auth-server` directory run:
 
 ```
 mvn gatling:test -Dgatling.simulationClass=ee.cyber.cdoc2.server.StartAuthFunctionalTests

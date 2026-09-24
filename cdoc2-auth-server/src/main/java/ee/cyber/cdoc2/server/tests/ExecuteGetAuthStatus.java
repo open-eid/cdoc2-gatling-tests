@@ -1,13 +1,17 @@
 package ee.cyber.cdoc2.server.tests;
 
-import ee.cyber.cdoc2.server.SessionVariables;
-import ee.cyber.cdoc2.server.conf.TestConfig;
 import io.gatling.javaapi.core.ChainBuilder;
+import io.gatling.javaapi.http.HttpRequestActionBuilder;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import static io.gatling.javaapi.core.CoreDsl.exec;
-import static io.gatling.javaapi.core.CoreDsl.jsonPath;
+
+import java.time.Duration;
+
+import ee.cyber.cdoc2.server.SessionVariables;
+import ee.cyber.cdoc2.server.conf.TestConfig;
+
+import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.http;
 import static io.gatling.javaapi.http.HttpDsl.status;
 
@@ -42,6 +46,61 @@ public abstract class ExecuteGetAuthStatus {
                     jsonPath("$.status").is(expectedStatus).saveAs(SessionVariables.AUTH_STATUS)
                 )
         ).exitHereIfFailed();
+    }
+
+    protected ChainBuilder pollAuthStatusCheckStatusIs(String requestName, String expectedStatus) {
+        return pollAuthStatusCheckStatusIs(
+            requestName,
+            expectedStatus,
+            Duration.ofSeconds(30),
+            Duration.ofSeconds(1)
+        );
+    }
+
+    /**
+     *  Polls the for the expected auth status at pollInterval until the timeout is reached
+     */
+    protected ChainBuilder pollAuthStatusCheckStatusIs(String requestName,
+                                                       String expectedStatus,
+                                                       Duration timeout,
+                                                       Duration pollInterval) {
+        return exec(session -> session.remove(SessionVariables.AUTH_STATUS))
+            .asLongAsDuring(
+                session -> !expectedStatus.equals(session.getString(SessionVariables.AUTH_STATUS)),
+                timeout
+            ).on(
+                exec(
+                    authStatusRequest(requestName)
+                        .check(
+                            status().is(HttpResponseStatus.OK.code()),
+                            jsonPath("$.status").saveAs(SessionVariables.AUTH_STATUS)
+                        )
+                )
+                    .exitHereIfFailed()
+                    .doIf(session -> !expectedStatus.equals(session.getString(SessionVariables.AUTH_STATUS)))
+                    .then(pause(pollInterval))
+            )
+            // Timed out: send one last request with the strict check so it's recorded as KO
+            .doIf(session -> !expectedStatus.equals(session.getString(SessionVariables.AUTH_STATUS)))
+            .then(
+                exec(
+                    authStatusRequest("TIMEOUT - " + requestName)
+                        .check(
+                            status().is(HttpResponseStatus.OK.code()),
+                            jsonPath("$.status").is(expectedStatus).saveAs(SessionVariables.AUTH_STATUS)
+                        )
+                )
+            )
+            .exitHereIfFailed();
+    }
+
+    private HttpRequestActionBuilder authStatusRequest(String requestName) {
+        return http(requestName)
+            .get(session -> {
+                String location = session.getString(SessionVariables.LOCATION);
+                log.info("Request \"{}\". Auth process location is {}", requestName, location);
+                return this.testConf.getServerBaseUrl() + location;
+            });
     }
 
     /**

@@ -79,22 +79,32 @@ public final class StartAuthFunctionalTests extends Simulation {
             // GET /auth/status/{authProcessUuid}
             scenario("Get completed auth process status once")
                 .exec(this.startAuthScenarios.startSidAuth())
-                .exec(this.getAuthStatusScenarios.getAuthStatusCompletedOnce())
+                .exec(this.getAuthStatusScenarios.pollAuthStatusCompleted())
                 .injectOpen(atOnceUsers(1))
                 .protocols(this.client),
             scenario("Get completed auth process status repeatedly")
                 .exec(this.startAuthScenarios.startSidAuth())
-                .exec(this.getAuthStatusScenarios.getAuthStatusCompletedFirstPoll())
-                .exec(this.getAuthStatusScenarios.getAuthStatusCompletedSecondPoll())
+                .exec(this.getAuthStatusScenarios.pollAuthStatusCompletedFirst())
+                .exec(this.getAuthStatusScenarios.getAuthStatusCompletedSecond())
                 .injectOpen(atOnceUsers(1))
                 .protocols(this.client),
-            scenario("Get running auth process status")
+            scenario("Get running auth process status for SID")
+                .exec(this.startAuthScenarios.startSidAuth())
+                .exec(this.getAuthStatusScenarios.getAuthStatusRunning())
+                .injectOpen(atOnceUsers(1))
+                .protocols(this.client),
+            scenario("Get running auth process status for MID")
                 .exec(this.startAuthScenarios.startMidAuth())
                 .exec(this.getAuthStatusScenarios.getAuthStatusRunning())
                 .injectOpen(atOnceUsers(1))
                 .protocols(this.client),
-            scenario("Get failed auth process status")
+            scenario("Get failed auth process status for SID")
                 .exec(this.startAuthScenarios.startSidAuthForRefusal())
+                .exec(this.getAuthStatusScenarios.getAuthStatusFailed())
+                .injectOpen(atOnceUsers(1))
+                .protocols(this.client),
+            scenario("Get failed auth process status for MID")
+                .exec(this.startAuthScenarios.startMidAuthForRefusal())
                 .exec(this.getAuthStatusScenarios.getAuthStatusFailed())
                 .injectOpen(atOnceUsers(1))
                 .protocols(this.client),
