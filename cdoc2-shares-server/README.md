@@ -140,3 +140,40 @@ To add the test CA certificate to the server's truststore:
 keytool -import -trustcacerts -file gatling-ca.pem -alias gatling-ca -storepass passwd \
  -keystore path/to/servertruststore.jks
 ```
+
+## Docker
+
+### Build image
+
+From `cdoc2-shares-server` directory:
+
+````
+mvn clean install
+docker build -t cdoc2-shares-server-gatling .
+````
+
+### Run
+
+Create results directory
+
+````
+mkdir -p results
+````
+
+The docker commands expect an `application.conf` file in the working directory
+
+replace `KeyShareFunctionalTests` with `KeySharesLoadTests` to run load tests
+
+````
+docker run --rm --network host \
+  --user "$(id -u):$(id -g)" \
+  -v "$(pwd)/results:/gatling/results" \
+  -v "$(pwd)/application.conf:/gatling/application.conf:ro" \
+  -e MAIN_CLASS=io.gatling.app.Gatling \
+  -e MAIN_CLASS_ARGS="-s ee.cyber.cdoc2.server.KeyShareFunctionalTests -rf /gatling/results" \
+  -e JAVA_OPTS="-Xmx2g \
+  -Dconfig.file=application.conf \
+  --add-opens java.base/java.lang=ALL-UNNAMED \
+  -Dlogback.configurationFile=/gatling/logback.xml" \
+  cdoc2-shares-server-gatling
+````
