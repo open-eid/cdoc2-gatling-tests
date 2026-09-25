@@ -1,10 +1,10 @@
 # this file is used to build a docker image with cdoc Gatling tests
 
 # for RIA infra
-#FROM nexus.riaint.ee:8500/library/openjdk:21-alpine
+FROM nexus.riaint.ee:8500/library/eclipse-temurin:21
 
 # for non-RIA infra
-FROM eclipse-temurin:21
+#FROM eclipse-temurin:21
 
 WORKDIR /gatling
 
