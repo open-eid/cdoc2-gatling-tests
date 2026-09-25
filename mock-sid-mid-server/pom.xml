@@ -12,8 +12,8 @@
     <artifactId>cdoc2-sid-mid-mock</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <description>
-        Mock Smart-ID and Mobile-ID REST APIs, so that cdoc2-auth-server and cdoc2-rp-server
-        functional and load tests don't need to depend on (or place load on) the real SK demo environment.
+        Mock Smart-ID and Mobile-ID REST APIs, so that cdoc2-auth-server functional and load tests
+        don't need to depend on (or place load on) the real SK demo environment.
     </description>
 
     <properties>

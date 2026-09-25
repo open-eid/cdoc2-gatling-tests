@@ -1,7 +1,7 @@
 # this file is used to build a docker image with cdoc Gatling tests
 
 # for RIA infra
-FROM nexus.riaint.ee:8500/library/eclipse-temurin:21
+FROM harbor.riaint.ee/proxy-hub.docker.com/library/eclipse-temurin:21
 
 # for non-RIA infra
 # FROM eclipse-temurin:21
