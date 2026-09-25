@@ -79,7 +79,7 @@ For executing load tests run from gatling-tests directory:
 mvn gatling:test -Dgatling.simulationClass=ee.cyber.cdoc2.server.StartAuthLoadTests
 ```
 
-#### Constant user load tests with final user ramp (up or down)
+#### Constant user load tests
 
 ```
 mvn gatling:test -Dgatling.simulationClass=ee.cyber.cdoc2.server.StartAuthConstantLoadTests
@@ -111,11 +111,11 @@ run load tests
 
 ````
 docker run --rm --network host \
-  --user "$(id -u):$(id -g)" \cle
+  --user "$(id -u):$(id -g)" \
   -v "$(pwd)/results:/gatling/results" \
   -v "$(pwd)/application.conf:/gatling/application.conf:ro" \
   -e MAIN_CLASS=io.gatling.app.Gatling \
-  -e MAIN_CLASS_ARGS="-s ee.cyber.cdoc2.server.StartAuthConstantLoadTests -rf /gatling/results" \
+  -e MAIN_CLASS_ARGS="-s ee.cyber.cdoc2.server.StartAuthFunctionalTests -rf /gatling/results" \
   -e JAVA_OPTS="-Xmx2g \
   -Dconfig.file=application.conf \
   --add-opens java.base/java.lang=ALL-UNNAMED \

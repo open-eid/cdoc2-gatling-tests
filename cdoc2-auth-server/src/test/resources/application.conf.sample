@@ -27,13 +27,10 @@ load-test {
 
 # Half the user start a Smart-ID auth process and half a Mobile-ID auth process and check its status, each performing a
 # call to the auth server under test, reusing a single fixed demo test identity.
-# Test runs with a number of concurrent users for a set duration, after which user count is ramped
-# (up or down) over a duration
+# Test runs with a number of concurrent users for a set duration
 constant-load-test {
     request {
         concurrent-users = 20
         concurrent-users-duration-seconds = 10
-        ramp-to-users = 0
-        ramp-duration-seconds = 1
     }
 }

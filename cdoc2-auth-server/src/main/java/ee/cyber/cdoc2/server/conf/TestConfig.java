@@ -57,9 +57,7 @@ public class TestConfig {
 
         return new ConstantLoadTestConfig(
             request.getInt("concurrent-users"),
-            request.getLong("concurrent-users-duration-seconds"),
-            request.getInt("ramp-to-users"),
-            request.getLong("ramp-duration-seconds")
+            request.getLong("concurrent-users-duration-seconds")
         );
     }
 }
