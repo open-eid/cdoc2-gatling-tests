@@ -8,10 +8,10 @@ FROM eclipse-temurin:21
 
 WORKDIR /gatling
 
-# the gatling .jar file is provided at runtime
-ARG JAR_FILE=gatling.jar
+ARG JAR_FILE=/target/cdoc2-auth-server-test-1.0.0-SNAPSHOT.jar
 
 COPY ${JAR_FILE} /gatling/gatling-tests.jar
+COPY logback.xml /gatling/logback.xml
 
 CMD java ${JAVA_OPTS} -cp /gatling/gatling-tests.jar ${MAIN_CLASS} ${MAIN_CLASS_ARGS}
 

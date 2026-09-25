@@ -72,3 +72,20 @@ app.mobileid.client.hostUrl=http://localhost:9500
 Plain HTTP is fine - neither client SDK requires an `https://` host URL. The existing
 `spring.ssl.bundle.jks.sid-server.*` / `spring.ssl.bundle.jks.mid-server.*` truststore properties
 can stay as they are; they're simply unused when no TLS handshake happens.
+
+## Docker
+
+### Build image
+
+From `mock-sid-mid-server` directory:
+
+````
+mvn clean install
+docker build -t mock-sid-mid-server .
+````
+
+### Run
+
+````
+docker run --rm -p 9500:9500 -e JAVA_OPTS="-Xmx2g -Dmock-server.sessionImmediate=false" mock-sid-mid-server
+````

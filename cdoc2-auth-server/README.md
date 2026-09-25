@@ -84,3 +84,41 @@ mvn gatling:test -Dgatling.simulationClass=ee.cyber.cdoc2.server.StartAuthLoadTe
 ```
 mvn gatling:test -Dgatling.simulationClass=ee.cyber.cdoc2.server.StartAuthConstantLoadTests
 ```
+
+## Docker
+
+### Build image
+
+From `cdoc2-auth-server` directory:
+
+````
+mvn clean install
+docker build -t cdoc2-auth-server-gatling .
+````
+
+### Create results directory
+
+````
+mkdir -p results
+````
+
+### Run
+
+The commands expect an `application.conf` file in the working directory
+
+replace `StartAuthFunctionalTests` with `StartAuthLoadTests` or `StartAuthConstantLoadTests` to 
+run load tests
+
+````
+docker run --rm --network host \
+  --user "$(id -u):$(id -g)" \cle
+  -v "$(pwd)/results:/gatling/results" \
+  -v "$(pwd)/application.conf:/gatling/application.conf:ro" \
+  -e MAIN_CLASS=io.gatling.app.Gatling \
+  -e MAIN_CLASS_ARGS="-s ee.cyber.cdoc2.server.StartAuthConstantLoadTests -rf /gatling/results" \
+  -e JAVA_OPTS="-Xmx2g \
+  -Dconfig.file=application.conf \
+  --add-opens java.base/java.lang=ALL-UNNAMED \
+  -Dlogback.configurationFile=/gatling/logback.xml" \
+  cdoc2-auth-server-gatling
+````
