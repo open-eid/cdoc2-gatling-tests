@@ -1,10 +1,5 @@
-# this file is used to build a docker image with cdoc Gatling tests
-
-# for RIA infra
-FROM harbor.riaint.ee/proxy-hub.docker.com/library/eclipse-temurin:21
-
-# for non-RIA infra
-# FROM eclipse-temurin:21
+ARG IMAGE=eclipse-temurin:21
+FROM ${IMAGE}
 
 WORKDIR /mock-sid-mid
 
