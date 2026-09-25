@@ -105,7 +105,7 @@ For executing load tests run from gatling-tests directory:
 mvn gatling:test -Dgatling.simulationClass=ee.cyber.cdoc2.server.RpServerLoadTests
 ```
 
-#### Constant user load tests with final user ramp (up or down)
+#### Constant user load tests
 
 ```
 mvn gatling:test -Dgatling.simulationClass=ee.cyber.cdoc2.server.RpServerConstantLoadTests
@@ -146,5 +146,5 @@ docker run --rm --network host \
   -Dconfig.file=application.conf \
   --add-opens java.base/java.lang=ALL-UNNAMED \
   -Dlogback.configurationFile=/gatling/logback.xml" \
-  cdoc2-auth-server-gatling
+  cdoc2-rp-server-gatling
 ````

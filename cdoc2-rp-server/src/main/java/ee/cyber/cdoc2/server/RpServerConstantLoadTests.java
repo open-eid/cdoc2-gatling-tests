@@ -46,19 +46,15 @@ public final class RpServerConstantLoadTests extends Simulation {
 
         int concurrentUsers = loadTestConfig.concurrentUsers() / 2;
         Long concurrentUsersDuration = loadTestConfig.concurrentUsersDuration();
-        int rampUsers = loadTestConfig.rampUsers() / 2;
-        Long rampDuration = loadTestConfig.rampDuration();
 
         setUp(
             sidScenarioBuilder.injectClosed(
                 constantConcurrentUsers(concurrentUsers)
-                    .during(concurrentUsersDuration), // 1
-                rampConcurrentUsers(concurrentUsers).to(rampUsers).during(rampDuration)
+                    .during(concurrentUsersDuration)
             ),
             midScenarioBuilder.injectClosed(
                 constantConcurrentUsers(concurrentUsers)
-                    .during(concurrentUsersDuration), // 1
-                rampConcurrentUsers(concurrentUsers).to(rampUsers).during(rampDuration)
+                    .during(concurrentUsersDuration)
             )
         ).protocols(this.httpConf)
             .assertions(global().successfulRequests().percent().is(100.0));
