@@ -9,6 +9,7 @@ import ee.cyber.cdoc2.server.scenarios.SidSessionScenarios;
 import io.gatling.javaapi.core.Simulation;
 import io.gatling.javaapi.http.HttpProtocolBuilder;
 import lombok.extern.slf4j.Slf4j;
+
 import static io.gatling.javaapi.core.CoreDsl.atOnceUsers;
 import static io.gatling.javaapi.core.CoreDsl.global;
 import static io.gatling.javaapi.core.CoreDsl.scenario;
@@ -163,6 +164,6 @@ public final class RpServerFunctionalTests extends Simulation {
                 .injectOpen(atOnceUsers(1))
                 .protocols(this.client)
         )
-        .assertions(global().successfulRequests().percent().is(100.0));
+            .assertions(global().successfulRequests().percent().is(100.0));
     }
 }

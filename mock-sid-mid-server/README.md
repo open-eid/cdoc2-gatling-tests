@@ -52,7 +52,7 @@ From the `gatling-tests` directory:
 
 ```
 mvn -pl mock-sid-mid-server -am package
-java -jar mock-sid-mid-server/target/cdoc2-auth-server-sid-mid-mock-1.0.0-SNAPSHOT.jar
+java -jar mock-sid-mid-server/target/cdoc2-sid-mid-mock-1.0.0-SNAPSHOT.jar
 ```
 
 The listen port defaults to `9500`; override with `-Dmock-server.port=<port>`.
