@@ -1,6 +1,4 @@
-FROM nexus.riaint.ee:8500/library/openjdk:17-alpine
 ARG IMAGE=openjdk:17-alpine
-
 FROM ${IMAGE}
 
 # the gatling .jar file is provided at runtime
