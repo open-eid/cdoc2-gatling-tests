@@ -122,15 +122,15 @@ mvn clean install
 docker build -t cdoc2-rp-server-gatling .
 ````
 
-### Create results directory
+### Run
+
+Create results directory
 
 ````
 mkdir -p results
 ````
 
-### Run
-
-The commands expect an `application.conf` file in the working directory
+The docker commands expect an `application.conf` file in the working directory
 
 replace `RpServerFunctionalTests` with `RpServerLoadTests` or `RpServerConstantLoadTests` to
 run load tests

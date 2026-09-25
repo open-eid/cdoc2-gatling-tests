@@ -96,15 +96,15 @@ mvn clean install
 docker build -t cdoc2-auth-server-gatling .
 ````
 
-### Create results directory
+### Run
+
+Create results directory
 
 ````
 mkdir -p results
 ````
 
-### Run
-
-The commands expect an `application.conf` file in the working directory
+The docker commands expect an `application.conf` file in the working directory
 
 replace `StartAuthFunctionalTests` with `StartAuthLoadTests` or `StartAuthConstantLoadTests` to 
 run load tests
