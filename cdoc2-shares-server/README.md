@@ -114,6 +114,12 @@ Or using a compiled jar:
 java $JAVA_OPTS --add-opens java.base/java.lang=ALL-UNNAMED -cp target/cdoc2-shares-server-test-1.0.0-SNAPSHOT.jar io.gatling.app.Gatling -s ee.cyber.cdoc2.server.KeySharesLoadTests -rf /tmp
 ```
 
+Constant user load tests:
+
+```
+mvn gatling:test -Dgatling.simulationClass=ee.cyber.cdoc2.server.RpServerConstantLoadTests
+```
+
 
 ## Server Keystore configuration
 
@@ -162,7 +168,8 @@ mkdir -p results
 
 The docker commands expect an `application.conf` file in the working directory
 
-replace `KeySharesFunctionalTests` with `KeySharesLoadTests` to run load tests
+replace `KeySharesFunctionalTests` with `KeySharesLoadTests` or `KeySharesConstantLoadTests` to run 
+load tests
 
 ````
 docker run --rm --network host \
