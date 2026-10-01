@@ -1,24 +1,22 @@
 package ee.cyber.cdoc2.server.tests;
 
-import ee.cyber.cdoc2.server.auth.AuthTokenSigner;
-import ee.cyber.cdoc2.server.auth.RpSignatureSigner;
-import ee.cyber.cdoc2.server.auth.SessionTokenSigner;
-import ee.cyber.cdoc2.server.SessionVariables;
-import ee.cyber.cdoc2.server.utils.TestDataGenerator;
-import ee.cyber.cdoc2.server.conf.TestConfig;
-import ee.cyber.cdoc2.server.dto.KeyShareRequest;
 import io.gatling.javaapi.core.ChainBuilder;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import ee.cyber.cdoc2.server.SessionVariables;
+import ee.cyber.cdoc2.server.auth.AuthTokenSigner;
+import ee.cyber.cdoc2.server.auth.RpSignatureSigner;
+import ee.cyber.cdoc2.server.auth.SessionTokenSigner;
+import ee.cyber.cdoc2.server.conf.TestConfig;
+import ee.cyber.cdoc2.server.dto.KeyShareRequest;
+import ee.cyber.cdoc2.server.utils.TestDataGenerator;
 
-import static io.gatling.javaapi.core.CoreDsl.bodyLength;
-import static io.gatling.javaapi.core.CoreDsl.bodyString;
-import static io.gatling.javaapi.core.CoreDsl.exec;
+import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.http;
 import static io.gatling.javaapi.http.HttpDsl.status;
 
@@ -45,8 +43,21 @@ public abstract class ExecuteGetKeyShares {
         String serverBaseUrl = this.testConf.getServerBaseUrl();
 
         return exec(session -> {
-            RpSignatureSigner.RpSignatureHeaders rpSignatureHeaders = RpSignatureSigner.sign();
+            String shareUrl = session.getString(SessionVariables.LOCATION);
+            String[] shareIdLocation = shareUrl.split("/");
+            String shareId = shareIdLocation[shareIdLocation.length - 1];
+            log.info("Request \"{}\". Share ID is {}", testId, shareId);
+
+            String nonce = session.getString(SessionVariables.NONCE);
+            log.info("Request \"{}\". Nonce is {}", testId, nonce);
+
+            String authToken = generateAuthToken(serverBaseUrl, shareId, nonce);
+
+            RpSignatureSigner.RpSignatureHeaders rpSignatureHeaders =
+                RpSignatureSigner.sign(testConf, authToken);
+
             return session
+                .set(SessionVariables.AUTH_TOKEN, authToken)
                 .set(SessionVariables.RP_SIGNED_HASH, rpSignatureHeaders.rpSignedHash())
                 .set(SessionVariables.RP_SIGNATURE_INPUT, rpSignatureHeaders.signatureInput())
                 .set(SessionVariables.RP_SIGNATURE, rpSignatureHeaders.signature());
@@ -57,21 +68,11 @@ public abstract class ExecuteGetKeyShares {
                     log.info("Request \"{}\". Share ID location is {}", testId, shareUrl);
                     return serverBaseUrl + shareUrl;
                 })
-                .header("x-cdoc2-auth-token", session -> {
-                    String shareUrl = session.getString(SessionVariables.LOCATION);
-                    String[] shareIdLocation = shareUrl.split("/");
-                    String shareId = shareIdLocation[shareIdLocation.length - 1];
-                    log.info("Request \"{}\". Share ID is {}", testId, shareId);
-
-                    String nonce = session.get(SessionVariables.NONCE);
-                    log.info("Request \"{}\". Nonce is {}", testId, nonce);
-                    return generateAuthToken(serverBaseUrl, shareId, nonce);
-                })
+                .header("x-cdoc2-auth-token", session -> session.getString(SessionVariables.AUTH_TOKEN))
                 .header("x-cdoc2-auth-x5c", TestDataGenerator.TEST_CERT_BASE64URL)
                 .header("x-cdoc2-session-token", session -> {
                     String sessionNonce = session.getString(SessionVariables.SESSION_NONCE);
-                    String nonceUrl = serverBaseUrl + "/session_nonce/" + sessionNonce;
-                    return SessionTokenSigner.signSessionToken(nonceUrl);
+                    return SessionTokenSigner.signSessionToken(testConf, sessionNonce);
                 })
                 .header("x-cdoc2-session-x5c", TestDataGenerator.TEST_CERT_BASE64URL)
                 .header("x-rp-signed-hash", session -> session.getString(SessionVariables.RP_SIGNED_HASH))
@@ -100,26 +101,36 @@ public abstract class ExecuteGetKeyShares {
         String serverBaseUrl = this.testConf.getServerBaseUrl();
 
         return exec(session -> {
-            RpSignatureSigner.RpSignatureHeaders rpSignatureHeaders = RpSignatureSigner.sign();
+            String shareUrl = session.getString(SessionVariables.LOCATION);
+            String[] shareIdLocation = shareUrl.split("/");
+            String shareId = shareIdLocation[shareIdLocation.length - 1];
+            log.info("Request \"{}\". Share ID is {}", testId, shareId);
+
+            String nonce = session.getString(SessionVariables.NONCE);
+            log.info("Request \"{}\". Nonce is {}", testId, nonce);
+
+            String authToken = generateAuthToken(serverBaseUrl, shareId, nonce);
+
+            RpSignatureSigner.RpSignatureHeaders rpSignatureHeaders =
+                RpSignatureSigner.sign(testConf, authToken);
+
             return session
+                .set(SessionVariables.AUTH_TOKEN, authToken)
                 .set(SessionVariables.RP_SIGNED_HASH, rpSignatureHeaders.rpSignedHash())
                 .set(SessionVariables.RP_SIGNATURE_INPUT, rpSignatureHeaders.signatureInput())
                 .set(SessionVariables.RP_SIGNATURE, rpSignatureHeaders.signature());
         }).exec(
             http(testId)
-                .get(session -> serverBaseUrl + session.getString(SessionVariables.LOCATION))
-                .header("x-cdoc2-auth-token", session -> {
+                .get(session -> {
                     String shareUrl = session.getString(SessionVariables.LOCATION);
-                    String[] shareIdLocation = shareUrl.split("/");
-                    String shareId = shareIdLocation[shareIdLocation.length - 1];
-                    String nonce = session.get(SessionVariables.NONCE);
-                    return generateAuthToken(serverBaseUrl, shareId, nonce);
+                    log.info("Request \"{}\". Share ID location is {}", testId, shareUrl);
+                    return serverBaseUrl + shareUrl;
                 })
+                .header("x-cdoc2-auth-token", session -> session.getString(SessionVariables.AUTH_TOKEN))
                 .header("x-cdoc2-auth-x5c", TestDataGenerator.TEST_CERT_BASE64URL)
                 .header("x-cdoc2-session-token", session -> {
                     String sessionNonce = session.getString(SessionVariables.SESSION_NONCE);
-                    String nonceUrl = serverBaseUrl + "/session_nonce/" + sessionNonce;
-                    return SessionTokenSigner.signSessionToken(nonceUrl);
+                    return SessionTokenSigner.signSessionToken(testConf, sessionNonce);
                 })
                 .header("x-cdoc2-session-x5c", TestDataGenerator.TEST_CERT_BASE64URL)
                 .header("x-rp-signed-hash", session -> session.getString(SessionVariables.RP_SIGNED_HASH))
@@ -141,20 +152,27 @@ public abstract class ExecuteGetKeyShares {
         String nonce = TestDataGenerator.randomString(TestDataGenerator.SHARE_ID_MIN_LENGTH);
 
         return exec(session -> {
-            RpSignatureSigner.RpSignatureHeaders rpSignatureHeaders = RpSignatureSigner.sign();
+            log.info("Request \"{}\". Share ID is {}", testId, shareId);
+            log.info("Request \"{}\". Nonce is {}", testId, nonce);
+
+            String authToken = generateAuthToken(serverBaseUrl, shareId, nonce);
+
+            RpSignatureSigner.RpSignatureHeaders rpSignatureHeaders =
+                RpSignatureSigner.sign(testConf, authToken);
+
             return session
+                .set(SessionVariables.AUTH_TOKEN, authToken)
                 .set(SessionVariables.RP_SIGNED_HASH, rpSignatureHeaders.rpSignedHash())
                 .set(SessionVariables.RP_SIGNATURE_INPUT, rpSignatureHeaders.signatureInput())
                 .set(SessionVariables.RP_SIGNATURE, rpSignatureHeaders.signature());
         }).exec(
-            http(testId + " - with shareId '" + shareId + "'")
+            http(testId)
                 .get(serverBaseUrl + API_ENDPOINT + '/' + shareId)
-                .header("x-cdoc2-auth-token", generateAuthToken(serverBaseUrl, shareId, nonce))
+                .header("x-cdoc2-auth-token", session -> session.getString(SessionVariables.AUTH_TOKEN))
                 .header("x-cdoc2-auth-x5c", TestDataGenerator.TEST_CERT_BASE64URL)
                 .header("x-cdoc2-session-token", session -> {
                     String sessionNonce = session.getString(SessionVariables.SESSION_NONCE);
-                    String nonceUrl = serverBaseUrl + "/session_nonce/" + sessionNonce;
-                    return SessionTokenSigner.signSessionToken(nonceUrl);
+                    return SessionTokenSigner.signSessionToken(testConf, sessionNonce);
                 })
                 .header("x-cdoc2-session-x5c", TestDataGenerator.TEST_CERT_BASE64URL)
                 .header("x-rp-signed-hash", session -> session.getString(SessionVariables.RP_SIGNED_HASH))

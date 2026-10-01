@@ -1,7 +1,5 @@
 package ee.cyber.cdoc2.server.auth;
 
-import ee.cyber.cdoc2.server.utils.TestDataGenerator;
-
 import lombok.extern.slf4j.Slf4j;
 
 import java.security.MessageDigest;
@@ -17,18 +15,19 @@ import com.authlete.hms.SignatureBaseBuilder;
 import com.authlete.hms.SignatureMetadata;
 import com.authlete.hms.SignatureMetadataParameters;
 import com.authlete.hms.impl.JoseHttpSigner;
+import com.authlete.sd.SDJWT;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jwt.SignedJWT;
+
+import ee.cyber.cdoc2.server.conf.TestConfig;
+import ee.cyber.cdoc2.server.utils.TestDataGenerator;
 
 /**
  * Creates the RFC 9421 HTTP message signature ("RP countersignature") that a relying party
  * attaches to "GET /key-shares/{shareId}" requests, so that load tests don't depend on a
  * running cdoc2-rp-server instance.
- * <p>
- * The signature is created with a fixed EC key ({@link TestDataGenerator#AUTH_TOKEN_SIGNING_KEY}),
- * whose public part must be served by whatever cdoc2-shares-server under test uses as its
- * "rp server well-known" JWK set, under the key ID computed by {@link #keyId(ECKey)}.
  */
 @Slf4j
 public final class RpSignatureSigner {
@@ -49,15 +48,21 @@ public final class RpSignatureSigner {
     ) {
     }
 
-    public static RpSignatureHeaders sign() {
+    public static RpSignatureHeaders sign(TestConfig testConfig, String authToken) {
         try {
-            ECKey pemKey = (ECKey) JWK.parseFromPEMEncodedObjects(TestDataGenerator.AUTH_TOKEN_SIGNING_KEY);
+            ECKey pemKey = (ECKey) JWK.parseFromPEMEncodedObjects(testConfig.getKeysConfig().rpCounterSigningKey());
             ECKey ecKey = new ECKey.Builder(pemKey)
                 .algorithm(JWSAlgorithm.ES256)
                 .build();
 
+            SDJWT token = SDJWT.parse(authToken);
+
+            // Issuer-signed JWT part of the SD-JWT (header.payload.signature)
+            SignedJWT credentialJwt = SignedJWT.parse(token.getCredentialJwt());
+            byte[] authTokenSignature = credentialJwt.getSignature().decode();
+
             String rpSignedHash = Base64.getEncoder().encodeToString(
-                MessageDigest.getInstance(HASH_ALGORITHM).digest(TestDataGenerator.randomBytes(32))
+                MessageDigest.getInstance(HASH_ALGORITHM).digest(authTokenSignature)
             );
 
             ComponentValueProvider context = new ComponentValueProvider()

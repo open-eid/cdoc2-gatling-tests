@@ -1,8 +1,5 @@
 package ee.cyber.cdoc2.server.auth;
 
-import ee.cyber.cdoc2.auth.Constants;
-import ee.cyber.cdoc2.server.utils.TestDataGenerator;
-
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
@@ -21,13 +18,13 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
+import ee.cyber.cdoc2.auth.Constants;
+import ee.cyber.cdoc2.server.conf.TestConfig;
+import ee.cyber.cdoc2.server.utils.TestDataGenerator;
+
 /**
  * Creates cdoc2-auth-server session tokens (SD-JWT) for load testing, so that load tests don't
  * depend on a running cdoc2-auth-server instance.
- * <p>
- * The token is signed with a fixed EC key ({@link TestDataGenerator#SESSION_TOKEN_SIGNING_KEY}),
- * whose public part must be served by whatever cdoc2-shares-server under test uses as its
- * "auth server well-known" JWK set (see {@link TestDataGenerator#SESSION_TOKEN_SIGNING_KEY_KID}).
  */
 @Slf4j
 public final class SessionTokenSigner {
@@ -39,8 +36,8 @@ public final class SessionTokenSigner {
         // utility class
     }
 
-    public static String signSessionToken(String nonceUrl) {
-        return signSessionToken(nonceUrl, TestDataGenerator.RECIPIENT);
+    public static String signSessionToken(TestConfig config, String nonce) {
+        return signSessionToken(config, nonce, TestDataGenerator.RECIPIENT);
     }
 
     /**
@@ -49,11 +46,12 @@ public final class SessionTokenSigner {
      * matching certificate must be passed separately as the "x-cdoc2-session-x5c" header, since
      * the server cross-checks the token subject against that certificate's identity.
      */
-    public static String signSessionToken(String nonceUrl, String subject) {
+    public static String signSessionToken(TestConfig testConfig, String nonce, String subject) {
         try {
-            JWK jwk = JWK.parseFromPEMEncodedObjects(TestDataGenerator.SESSION_TOKEN_SIGNING_KEY);
+            JWK jwk = JWK.parseFromPEMEncodedObjects(testConfig.getKeysConfig().sessionTokenSigningKey());
             ECKey privateKey = jwk.toECKey();
 
+            String nonceUrl = testConfig.getServerBaseUrl() + "/session_nonce/" + nonce;
             Disclosure audDisclosure = new Disclosure("aud", List.of(nonceUrl));
 
             Instant now = Instant.now();
@@ -69,7 +67,7 @@ public final class SessionTokenSigner {
             SignedJWT signedJWT = new SignedJWT(
                 new JWSHeader.Builder(JWSAlgorithm.ES256)
                     .type(new JOSEObjectType(Constants.TYPE_SESSION_TOKEN))
-                    .keyID(TestDataGenerator.SESSION_TOKEN_SIGNING_KEY_KID)
+                    .keyID(privateKey.computeThumbprint().toString())
                     .build(),
                 claimsSet
             );

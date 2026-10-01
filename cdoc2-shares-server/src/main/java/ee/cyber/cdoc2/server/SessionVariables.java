@@ -12,4 +12,5 @@ public final class SessionVariables {
     public static final String RP_SIGNED_HASH = "RP_SIGNED_HASH";
     public static final String RP_SIGNATURE_INPUT = "RP_SIGNATURE_INPUT";
     public static final String RP_SIGNATURE = "RP_SIGNATURE";
+    public static final String AUTH_TOKEN = "AUTH_TOKEN";
 }

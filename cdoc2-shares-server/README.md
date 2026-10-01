@@ -63,14 +63,14 @@ A CDOC server must be running on the host:port as configured in the configuratio
 From gatling-tests directory run:
 
 ```
-mvn gatling:test -Dgatling.simulationClass=ee.cyber.cdoc2.server.KeyShareFunctionalTests
+mvn gatling:test -Dgatling.simulationClass=ee.cyber.cdoc2.server.KeySharesFunctionalTests
 ```
 
 Or using a compiled jar:
 
 ```
 export JAVA_OPTS="-Dgatling.ssl.useOpenSsl=false -Dconfig.file=src/test/resources/application.conf -Dlogback.configurationFile=src/test/resources/logback-test.xml"
-java $JAVA_OPTS --add-opens java.base/java.lang=ALL-UNNAMED -cp target/cdoc2-shares-server-test-1.0.0-SNAPSHOT.jar io.gatling.app.Gatling -s ee.cyber.cdoc2.server.KeyShareFunctionalTests -rf /tmp/
+java $JAVA_OPTS --add-opens java.base/java.lang=ALL-UNNAMED -cp target/cdoc2-shares-server-test-1.0.0-SNAPSHOT.jar io.gatling.app.Gatling -s ee.cyber.cdoc2.server.KeySharesFunctionalTests -rf /tmp/
 ```
 
 
@@ -162,7 +162,7 @@ mkdir -p results
 
 The docker commands expect an `application.conf` file in the working directory
 
-replace `KeyShareFunctionalTests` with `KeySharesLoadTests` to run load tests
+replace `KeySharesFunctionalTests` with `KeySharesLoadTests` to run load tests
 
 ````
 docker run --rm --network host \
@@ -170,7 +170,7 @@ docker run --rm --network host \
   -v "$(pwd)/results:/gatling/results" \
   -v "$(pwd)/application.conf:/gatling/application.conf:ro" \
   -e MAIN_CLASS=io.gatling.app.Gatling \
-  -e MAIN_CLASS_ARGS="-s ee.cyber.cdoc2.server.KeyShareFunctionalTests -rf /gatling/results" \
+  -e MAIN_CLASS_ARGS="-s ee.cyber.cdoc2.server.KeySharesFunctionalTests -rf /gatling/results" \
   -e JAVA_OPTS="-Xmx2g \
   -Dconfig.file=application.conf \
   --add-opens java.base/java.lang=ALL-UNNAMED \

@@ -21,7 +21,7 @@ import static io.gatling.javaapi.http.HttpDsl.http;
  */
 @Slf4j
 @SuppressWarnings("squid:S2187") //SonarQube: TestCases should contain tests
-public final class KeyShareFunctionalTests extends Simulation {
+public final class KeySharesFunctionalTests extends Simulation {
 
     private final TestConfig config = TestConfig.load();
     private final CreateKeySharesScenarios createScenarios = new CreateKeySharesScenarios(this.config);
@@ -54,8 +54,17 @@ public final class KeyShareFunctionalTests extends Simulation {
             .exec(this.getScenarios.getKeyShareWithMismatchedRecipient())
             .exitHereIfFailed();
 
+    ScenarioBuilder fullFlow = scenario("Run full key share flow")
+        .exec(this.createScenarios.sendKeyShare())
+        .exec(this.sessionNonceScenarios.createSessionNonce())
+        .exec(this.nonceScenarios.createNonceForKeyShare())
+        .exec(this.getScenarios.getKeyShare());
+
     {
         setUp(
+            this.fullFlow
+                .injectOpen(atOnceUsers(1))
+                .protocols(this.client),
             this.createScenarios.sendKeyShareRepeatedly()
                 .injectOpen(atOnceUsers(1))
                 .protocols(this.client),
