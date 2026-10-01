@@ -1,14 +1,17 @@
 package ee.cyber.cdoc2.server.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nimbusds.jose.util.X509CertUtils;
-import ee.cyber.cdoc2.server.dto.MidAuthenticationRequest;
-import ee.cyber.cdoc2.server.dto.SidAuthenticationRequest;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Random;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jose.util.X509CertUtils;
+
+import ee.cyber.cdoc2.server.dto.MidAuthenticationRequest;
+import ee.cyber.cdoc2.server.dto.SidAuthenticationRequest;
 
 /**
  * Generates test data
@@ -57,14 +60,6 @@ public final class TestDataGenerator {
     @SuppressWarnings("LineLength")
     public static final String MID_SESSION_CERT_BASE64URL = "MIIDqDCCAy6gAwIBAgIQB9W11BzBABj-0d_AZx6UHzAKBggqhkjOPQQDAjBxMQswCQYDVQQGEwJFRTEbMBkGA1UECgwSU0sgSUQgU29sdXRpb25zIEFTMRcwFQYDVQRhDA5OVFJFRS0xMDc0NzAxMzEsMCoGA1UEAwwjVEVTVCBvZiBTSyBJRCBTb2x1dGlvbnMgRUlELVEgMjAyMUUwHhcNMjQwNjEyMDY0NTI4WhcNMjkwNjE2MDY0NTI3WjCBlTELMAkGA1UEBhMCRUUxLzAtBgNVBAMMJk1BUlkgw4ROTixPJ0NPTk5Fxb0txaBVU0xJSyBURVNUTlVNQkVSMSUwIwYDVQQEDBxPJ0NPTk5Fxb0txaBVU0xJSyBURVNUTlVNQkVSMRIwEAYDVQQqDAlNQVJZIMOETk4xGjAYBgNVBAUTEVBOT0VFLTUxMzA3MTQ5NTYwMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEWlV1aVSXw6WhagWmFmXE_oe-0R1xZzrHyoiVlgKpGiJ8cwIQLogRGQnWY7NwgQvRHCBmsl99bj57h7SWnd03m6OCAYEwggF9MAkGA1UdEwQCMAAwHwYDVR0jBBgwFoAUScfc7QYUosdtnKbP11L9aOXoBBQwcAYIKwYBBQUHAQEEZDBiMDMGCCsGAQUFBzAChidodHRwOi8vYy5zay5lZS9URVNUX0VJRC1RXzIwMjFFLmRlci5jcnQwKwYIKwYBBQUHMAGGH2h0dHA6Ly9haWEuZGVtby5zay5lZS9laWRxMjAyMWUweAYDVR0gBHEwbzAIBgYEAI96AQIwYwYJKwYBBAHOHxIBMFYwVAYIKwYBBQUHAgEWSGh0dHBzOi8vd3d3LnNraWRzb2x1dGlvbnMuZXUvcmVzb3VyY2VzL2NlcnRpZmljYXRpb24tcHJhY3RpY2Utc3RhdGVtZW50LzA0BgNVHR8ELTArMCmgJ6AlhiNodHRwOi8vYy5zay5lZS90ZXN0X2VpZC1xXzIwMjFlLmNybDAdBgNVHQ4EFgQUj8KjnXvGQJCRYOd5LVfPku7QsZwwDgYDVR0PAQH_BAQDAgeAMAoGCCqGSM49BAMCA2gAMGUCMQCocXWDbBnkM3WEyBdv9Vm0A1MNRv08WrR192dRBcX42Kz5oiH0SdHRJv2ffeuEeSwCMEw2tSA3ClJv233Dl7rIYU_T6UG2NQhvDD5FhnP0umZRmVfAUQ6eVcmU8AhFtNJjwg==";
 
-    public static final String SESSION_TOKEN_SIGNING_KEY_KID = "L3RrY5YVqn7fCEg6hf_-lsGUnhPc9dcKuTeTvJHO9W8";
-    public static final String SESSION_TOKEN_SIGNING_KEY = """
-        -----BEGIN EC PRIVATE KEY-----
-        MHcCAQEEIGzQ2m+aRsNRJEUMbaVqCwiiwrBoyFD3uWNQp8klNUJHoAoGCCqGSM49
-        AwEHoUQDQgAEgQT1/Ud+qCJZL+9zm/HBb2v/L1+ermyIo5IohV4SvyxjQMvAfl8d
-        lLHBM3s12ntWsTKzfKp0xD/lx+YBgU54SQ==
-        -----END EC PRIVATE KEY-----""";
-
     @SneakyThrows
     public static String toJson(Object dto) {
         return JSON.writeValueAsString(dto);
@@ -74,6 +69,7 @@ public final class TestDataGenerator {
      * Generates a random alphanumeric string with exactly the given character length. Used both
      * for precise boundary testing and for standing in for a syntactically-invalid token/cert
      * value.
+     *
      * @param length the exact length of the string
      * @return a random string with exactly the given length
      */
@@ -87,6 +83,7 @@ public final class TestDataGenerator {
 
     /**
      * Generates random bytes
+     *
      * @param length the number of bytes to generate
      * @return random bytes
      */

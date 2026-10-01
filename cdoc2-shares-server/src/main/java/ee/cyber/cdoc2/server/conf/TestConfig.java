@@ -1,12 +1,13 @@
 package ee.cyber.cdoc2.server.conf;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 /**
  * Gatling test configuration properties for shares server instances
@@ -19,12 +20,11 @@ public class TestConfig {
 
     private final String serverBaseUrl;
     private final LoadTestConfig loadTestConfig;
+    private final ConstantLoadTestConfig constantLoadTestConfig;
+    private final KeysConfig keysConfig;
 
     /**
      * Loads the configuration from file
-     *
-     * @param isLoadTest boolean indicating whether to read load test configuration
-     *
      * see @link https://github.com/lightbend/config#standard-behavior for file names and formats
      */
     public static TestConfig load() {
@@ -32,7 +32,9 @@ public class TestConfig {
 
         var testConf = new TestConfig(
             conf.getString("shares-server.base-url"),
-            readLoadTestConfig(conf)
+            readLoadTestConfig(conf),
+            reloadConstantLoadTestConfig(conf),
+            reloadKeysConfig(conf)
         );
 
         log.info("Loaded test configuration: {}", testConf);
@@ -49,6 +51,24 @@ public class TestConfig {
             request.getLong("cycle-duration-seconds"),
             request.getLong("start-users-per-second"),
             request.getLong("initial-delay-seconds")
+        );
+    }
+
+    private static ConstantLoadTestConfig reloadConstantLoadTestConfig(Config config) {
+        var request = config.getConfig("constant-load-test.request");
+
+        return new ConstantLoadTestConfig(
+            request.getInt("concurrent-users"),
+            request.getLong("concurrent-users-duration-seconds")
+        );
+    }
+
+    private static KeysConfig reloadKeysConfig(Config config) {
+        var request = config.getConfig("keys");
+
+        return new KeysConfig(
+            request.getString("session-token-signing-key"),
+            request.getString("rp-counter-signing-key")
         );
     }
 }

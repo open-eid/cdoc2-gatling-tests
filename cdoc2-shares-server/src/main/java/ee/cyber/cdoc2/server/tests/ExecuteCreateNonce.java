@@ -52,8 +52,7 @@ public abstract class ExecuteCreateNonce {
                 })
                 .header("x-cdoc2-session-token", session -> {
                     String sessionNonce = session.getString(SessionVariables.SESSION_NONCE);
-                    String nonceUrl = this.testConf.getServerBaseUrl() + "/session_nonce/" + sessionNonce;
-                    return SessionTokenSigner.signSessionToken(nonceUrl, subject);
+                    return SessionTokenSigner.signSessionToken(testConf, sessionNonce, subject);
                 })
                 .header("x-cdoc2-session-x5c", sessionX5c)
                 .check(
@@ -78,8 +77,7 @@ public abstract class ExecuteCreateNonce {
                 .post(this.testConf.getServerBaseUrl() + "/key-shares/" + shareId + "/nonce")
                 .header("x-cdoc2-session-token", session -> {
                     String sessionNonce = session.getString(SessionVariables.SESSION_NONCE);
-                    String nonceUrl = this.testConf.getServerBaseUrl() + "/session_nonce/" + sessionNonce;
-                    return SessionTokenSigner.signSessionToken(nonceUrl);
+                    return SessionTokenSigner.signSessionToken(testConf, sessionNonce);
                 })
                 .header("x-cdoc2-session-x5c", TestDataGenerator.TEST_CERT_BASE64URL)
                 .check(

@@ -6,6 +6,31 @@ shares-server {
   base-url = "https://localhost:8443"
 }
 
+# Keys conf
+# session-token-signing-key : private key used by cdoc2-auth-server to sign the session token.
+#                             Must match cdoc2-auth-server in the testing environment
+# rp-counter-signing-key : private key used by rp-server to create the HTTP signature
+                           (counter-signature). Must match cdoc2-rp-server in the testing
+                           environment
+
+keys {
+    session-token-signing-key = """
+-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEIGzQ2m+aRsNRJEUMbaVqCwiiwrBoyFD3uWNQp8klNUJHoAoGCCqGSM49
+AwEHoUQDQgAEgQT1/Ud+qCJZL+9zm/HBb2v/L1+ermyIo5IohV4SvyxjQMvAfl8d
+lLHBM3s12ntWsTKzfKp0xD/lx+YBgU54SQ==
+-----END EC PRIVATE KEY-----
+    """
+
+    rp-counter-signing-key = """
+-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEIAjwC1cDF0aXNC/u8wKRRFWi2Uhmv8/P6waDwDoNlF3OoAoGCCqGSM49
+AwEHoUQDQgAEH0VsHWVwImGA4uolFRROI5MWsEnVFrOKkFlRsFHRGKSQ5Kgvu6i6
+OqgiAIifzruWroT4t+WkzLoTx+wRgFxjEw==
+-----END EC PRIVATE KEY-----
+    """
+}
+
 # Load test configuration
 # See https://gatling.io/docs/gatling/reference/current/core/injection/#incrementuserspersec
 # for details.
@@ -18,5 +43,13 @@ load-test {
         cycle-duration-seconds = 10
         # wait for some shares and nonces to be created for get share input
         initial-delay-seconds = 5
+    }
+}
+
+# Test runs with a number of concurrent users for a set duration
+constant-load-test {
+    request {
+        concurrent-users = 20
+        concurrent-users-duration-seconds = 10
     }
 }
