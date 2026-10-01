@@ -49,7 +49,6 @@ public abstract class AbstractRpEndpointTest {
      */
     protected String signSessionToken(Session session, String subject) {
         String nonce = session.getString(SessionVariables.SESSION_NONCE);
-        String nonceUrl = this.testConf.getServerBaseUrl() + "/session_nonce/" + nonce;
-        return SessionTokenSigner.signSessionToken(nonceUrl, subject);
+        return SessionTokenSigner.signSessionToken(this.testConf, nonce, subject);
     }
 }

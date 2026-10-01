@@ -6,6 +6,19 @@ rp-server {
   base-url = "https://localhost:7600"
 }
 
+# Keys conf
+# session-token-signing-key : private key used by cdoc2-auth-server to sign the session token
+
+keys {
+    session-token-signing-key = """
+-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEIGzQ2m+aRsNRJEUMbaVqCwiiwrBoyFD3uWNQp8klNUJHoAoGCCqGSM49
+AwEHoUQDQgAEgQT1/Ud+qCJZL+9zm/HBb2v/L1+ermyIo5IohV4SvyxjQMvAfl8d
+lLHBM3s12ntWsTKzfKp0xD/lx+YBgU54SQ==
+-----END EC PRIVATE KEY-----
+    """
+}
+
 # Load test configuration
 # See https://gatling.io/docs/gatling/reference/current/core/injection/
 # for details.
