@@ -7,11 +7,11 @@ shares-server {
 }
 
 # Keys conf
-# session-token-signing-key : private key used by cdoc2-auth-server to sign the session token
-# session-token-signing-key-kid : SHA-256 thumbprint of the corresponding public key
-# used as the KID. See RFC 7638
-# must mach values provided by the cdoc2-auth-server in the testing environment
-# You can use the GET /.well-known/jwks.jws endpoint of cdo2-auth-server to get the correct KID
+# session-token-signing-key : private key used by cdoc2-auth-server to sign the session token.
+#                             Must match cdoc2-auth-server in the testing environment
+# rp-counter-signing-key : private key used by rp-server to create the HTTP signature
+                           (counter-signature). Must match cdoc2-rp-server in the testing
+                           environment
 
 keys {
     session-token-signing-key = """
@@ -21,8 +21,6 @@ AwEHoUQDQgAEgQT1/Ud+qCJZL+9zm/HBb2v/L1+ermyIo5IohV4SvyxjQMvAfl8d
 lLHBM3s12ntWsTKzfKp0xD/lx+YBgU54SQ==
 -----END EC PRIVATE KEY-----
     """
-
-    session-token-signing-key-kid = L3RrY5YVqn7fCEg6hf_-lsGUnhPc9dcKuTeTvJHO9W8
 
     rp-counter-signing-key = """
 -----BEGIN EC PRIVATE KEY-----
@@ -45,5 +43,13 @@ load-test {
         cycle-duration-seconds = 10
         # wait for some shares and nonces to be created for get share input
         initial-delay-seconds = 5
+    }
+}
+
+# Test runs with a number of concurrent users for a set duration
+constant-load-test {
+    request {
+        concurrent-users = 20
+        concurrent-users-duration-seconds = 10
     }
 }

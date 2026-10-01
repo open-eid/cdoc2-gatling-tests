@@ -20,6 +20,7 @@ public class TestConfig {
 
     private final String serverBaseUrl;
     private final LoadTestConfig loadTestConfig;
+    private final ConstantLoadTestConfig constantLoadTestConfig;
     private final KeysConfig keysConfig;
 
     /**
@@ -32,6 +33,7 @@ public class TestConfig {
         var testConf = new TestConfig(
             conf.getString("shares-server.base-url"),
             readLoadTestConfig(conf),
+            reloadConstantLoadTestConfig(conf),
             reloadKeysConfig(conf)
         );
 
@@ -49,6 +51,15 @@ public class TestConfig {
             request.getLong("cycle-duration-seconds"),
             request.getLong("start-users-per-second"),
             request.getLong("initial-delay-seconds")
+        );
+    }
+
+    private static ConstantLoadTestConfig reloadConstantLoadTestConfig(Config config) {
+        var request = config.getConfig("constant-load-test.request");
+
+        return new ConstantLoadTestConfig(
+            request.getInt("concurrent-users"),
+            request.getLong("concurrent-users-duration-seconds")
         );
     }
 

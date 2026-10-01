@@ -7,7 +7,8 @@ rp-server {
 }
 
 # Keys conf
-# session-token-signing-key : private key used by cdoc2-auth-server to sign the session token
+# session-token-signing-key : private key used by cdoc2-auth-server to sign the session token.
+#                             Must match cdoc2-auth-server in the testing environment
 
 keys {
     session-token-signing-key = """
